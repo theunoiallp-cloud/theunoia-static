@@ -4,21 +4,25 @@ import { db, initDatabase } from '../config/db.js';
 
 export async function initializeDbAndAuth() {
   console.log('Initializing database schema...');
-  initDatabase();
+  await initDatabase();
   console.log('Database tables and indexes initialized.');
 
-  const adminRow = db.prepare('SELECT id FROM admin_auth WHERE id = 1').get();
+  const rs = await db.execute('SELECT id FROM admin_auth WHERE id = 1');
+  const adminRow = rs.rows[0];
   const initialPassword = process.env.ADMIN_INITIAL_PASSWORD;
 
   if (!adminRow) {
     if (!initialPassword) {
       console.warn('WARNING: No ADMIN_INITIAL_PASSWORD supplied in environment. Admin account is not seeded yet.');
     } else {
-      console.log('Seeding initial admin password hash into SQLite...');
+      console.log('Seeding initial admin password hash into database...');
       const saltRounds = 12;
       const hash = await bcrypt.hash(initialPassword, saltRounds);
       const now = new Date().toISOString();
-      db.prepare('INSERT INTO admin_auth (id, password_hash, updated_at) VALUES (1, ?, ?)').run(hash, now);
+      await db.execute({
+        sql: 'INSERT INTO admin_auth (id, password_hash, updated_at) VALUES (1, ?, ?)',
+        args: [hash, now]
+      });
       console.log('Admin password hash seeded successfully.');
     }
   } else {

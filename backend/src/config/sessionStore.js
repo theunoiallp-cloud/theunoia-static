@@ -3,7 +3,7 @@ import { db } from '../config/db.js';
 
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-export function createSession(userId, ip, userAgent) {
+export async function createSession(userId, ip, userAgent) {
   const sessionId = crypto.randomBytes(32).toString('hex');
   const expiresAt = Date.now() + SESSION_TTL_MS;
   const sessionData = JSON.stringify({
@@ -13,21 +13,26 @@ export function createSession(userId, ip, userAgent) {
     createdAt: new Date().toISOString()
   });
 
-  const stmt = db.prepare('INSERT INTO sessions (id, data, expires_at) VALUES (?, ?, ?)');
-  stmt.run(sessionId, sessionData, expiresAt);
+  await db.execute({
+    sql: 'INSERT INTO sessions (id, data, expires_at) VALUES (?, ?, ?)',
+    args: [sessionId, sessionData, expiresAt]
+  });
 
   return { sessionId, expiresAt };
 }
 
-export function getSession(sessionId) {
+export async function getSession(sessionId) {
   if (!sessionId) return null;
-  const stmt = db.prepare('SELECT id, data, expires_at FROM sessions WHERE id = ?');
-  const row = stmt.get(sessionId);
+  const rs = await db.execute({
+    sql: 'SELECT id, data, expires_at FROM sessions WHERE id = ?',
+    args: [sessionId]
+  });
 
+  const row = rs.rows[0];
   if (!row) return null;
 
-  if (row.expires_at < Date.now()) {
-    deleteSession(sessionId);
+  if (Number(row.expires_at) < Date.now()) {
+    await deleteSession(sessionId);
     return null;
   }
 
@@ -39,8 +44,10 @@ export function getSession(sessionId) {
   }
 }
 
-export function deleteSession(sessionId) {
+export async function deleteSession(sessionId) {
   if (!sessionId) return;
-  const stmt = db.prepare('DELETE FROM sessions WHERE id = ?');
-  stmt.run(sessionId);
+  await db.execute({
+    sql: 'DELETE FROM sessions WHERE id = ?',
+    args: [sessionId]
+  });
 }

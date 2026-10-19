@@ -13,19 +13,19 @@ import adminRouter from './routes/admin.js';
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Respect reverse proxy (e.g., Nginx, Caddy, Cloudflare)
+// Respect reverse proxy (e.g., Vercel, Nginx, Cloudflare)
 app.set('trust proxy', 1);
 
 // Configure CORS
-const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000')
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,http://localhost:5175')
   .split(',')
   .map(origin => origin.trim())
   .filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser tools (e.g., curl, server-to-server) or listed origins
-    if (!origin || allowedOrigins.includes(origin)) {
+    // In Vercel unified deployment or non-browser tools, allow same-origin or listed origins
+    if (!origin || allowedOrigins.includes(origin) || process.env.VERCEL) {
       callback(null, true);
     } else {
       callback(new Error(`Origin '${origin}' not permitted by CORS policy`));
@@ -71,7 +71,7 @@ app.use('/api/*', (req, res) => {
   res.status(404).json({ success: false, error: 'Endpoint not found' });
 });
 
-// Global error handler (prevents stack traces and internal leaks in production)
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled server error:', err.message);
   res.status(500).json({
@@ -80,14 +80,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Auto-cleanup expired sessions every hour
-setInterval(() => {
-  try {
-    cleanupExpiredSessions();
-  } catch (err) {
-    console.error('Session cleanup error:', err.message);
-  }
-}, 60 * 60 * 1000);
+// Auto-cleanup expired sessions (only run interval when in persistent Node process)
+if (!process.env.VERCEL) {
+  setInterval(async () => {
+    try {
+      await cleanupExpiredSessions();
+    } catch (err) {
+      console.error('Session cleanup error:', err.message);
+    }
+  }, 60 * 60 * 1000);
+}
 
 // Initialize DB and start server
 async function startServer() {

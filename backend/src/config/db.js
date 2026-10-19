@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import { createClient } from '@libsql/client';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -6,26 +6,37 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// In development or when DATABASE_PATH is not provided, store locally in backend/data/theunoia.db
-const defaultDbPath = path.resolve(__dirname, '../../data/theunoia.db');
-const dbPath = process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : defaultDbPath;
+// Configure Turso or local SQLite
+const tursoUrl = process.env.TURSO_DATABASE_URL;
+const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
 
-// Ensure directory exists
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+let clientConfig;
+
+if (tursoUrl) {
+  // Production / Remote Turso cloud connection
+  clientConfig = {
+    url: tursoUrl,
+    authToken: tursoAuthToken
+  };
+} else {
+  // Local development / fallback to SQLite file
+  const defaultDbPath = path.resolve(__dirname, '../../data/theunoia.db');
+  const dbPath = process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : defaultDbPath;
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+  // Convert Windows path separators for libSQL file URL
+  const normalizedPath = dbPath.replace(/\\/g, '/');
+  clientConfig = {
+    url: `file:${normalizedPath}`
+  };
 }
 
-// Open database connection
-export const db = new Database(dbPath);
+export const db = createClient(clientConfig);
 
-// Enable WAL mode and foreign keys for high performance and integrity
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
-
-export function initDatabase() {
-  // Create tables if they do not exist
-  db.exec(`
+export async function initDatabase() {
+  await db.executeMultiple(`
     CREATE TABLE IF NOT EXISTS contact_submissions (
       id TEXT PRIMARY KEY,
       full_name TEXT NOT NULL,
@@ -73,10 +84,10 @@ export function initDatabase() {
   `);
 }
 
-export function cleanupExpiredSessions() {
+export async function cleanupExpiredSessions() {
   const now = Date.now();
-  const stmt = db.prepare('DELETE FROM sessions WHERE expires_at < ?');
-  stmt.run(now);
+  await db.execute({
+    sql: 'DELETE FROM sessions WHERE expires_at < ?',
+    args: [now]
+  });
 }
-
-export { dbPath };

@@ -32,7 +32,8 @@ router.post('/login', loginLimiter, async (req, res) => {
       });
     }
 
-    const admin = db.prepare('SELECT id, password_hash FROM admin_auth WHERE id = 1').get();
+    const rs = await db.execute('SELECT id, password_hash FROM admin_auth WHERE id = 1');
+    const admin = rs.rows[0];
 
     if (!admin || !admin.password_hash) {
       return res.status(500).json({
@@ -41,7 +42,7 @@ router.post('/login', loginLimiter, async (req, res) => {
       });
     }
 
-    const matches = await bcrypt.compare(password, admin.password_hash);
+    const matches = await bcrypt.compare(password, String(admin.password_hash));
     if (!matches) {
       return res.status(401).json({
         success: false,
@@ -52,7 +53,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || 'unknown';
 
-    const { sessionId, expiresAt } = createSession(admin.id, ip, userAgent);
+    const { sessionId, expiresAt } = await createSession(Number(admin.id), ip, userAgent);
 
     const isProduction = process.env.NODE_ENV === 'production';
 
@@ -78,17 +79,26 @@ router.post('/login', loginLimiter, async (req, res) => {
 });
 
 // POST /api/admin/logout
-router.post('/logout', (req, res) => {
-  const sessionId = req.cookies?.theunoia_admin_session;
-  if (sessionId) {
-    deleteSession(sessionId);
-  }
+router.post('/logout', async (req, res) => {
+  try {
+    const sessionId = req.cookies?.theunoia_admin_session;
+    if (sessionId) {
+      await deleteSession(sessionId);
+    }
 
-  res.clearCookie('theunoia_admin_session', { path: '/' });
-  return res.json({
-    success: true,
-    message: 'Logged out successfully'
-  });
+    res.clearCookie('theunoia_admin_session', { path: '/' });
+    return res.json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    console.error('Error during admin logout:', error);
+    res.clearCookie('theunoia_admin_session', { path: '/' });
+    return res.json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  }
 });
 
 // GET /api/admin/me
@@ -100,25 +110,26 @@ router.get('/me', requireAdminAuth, (req, res) => {
 });
 
 // GET /api/admin/overview
-router.get('/overview', requireAdminAuth, (req, res) => {
+router.get('/overview', requireAdminAuth, async (req, res) => {
   try {
-    const totalContacts = db.prepare('SELECT COUNT(*) AS count FROM contact_submissions').get().count;
-    const newContacts = db.prepare("SELECT COUNT(*) AS count FROM contact_submissions WHERE status = 'new'").get().count;
-
-    const totalMakers = db.prepare('SELECT COUNT(*) AS count FROM maker_registrations').get().count;
-    const pendingMakers = db.prepare("SELECT COUNT(*) AS count FROM maker_registrations WHERE status = 'pending_review'").get().count;
-    const approvedMakers = db.prepare("SELECT COUNT(*) AS count FROM maker_registrations WHERE status = 'approved'").get().count;
-    const rejectedMakers = db.prepare("SELECT COUNT(*) AS count FROM maker_registrations WHERE status = 'rejected'").get().count;
+    const [totC, newC, totM, pendM, appM, rejM] = await Promise.all([
+      db.execute('SELECT COUNT(*) AS count FROM contact_submissions'),
+      db.execute("SELECT COUNT(*) AS count FROM contact_submissions WHERE status = 'new'"),
+      db.execute('SELECT COUNT(*) AS count FROM maker_registrations'),
+      db.execute("SELECT COUNT(*) AS count FROM maker_registrations WHERE status = 'pending_review'"),
+      db.execute("SELECT COUNT(*) AS count FROM maker_registrations WHERE status = 'approved'"),
+      db.execute("SELECT COUNT(*) AS count FROM maker_registrations WHERE status = 'rejected'")
+    ]);
 
     return res.json({
       success: true,
       data: {
-        totalContacts,
-        newContacts,
-        totalMakers,
-        pendingMakers,
-        approvedMakers,
-        rejectedMakers
+        totalContacts: Number(totC.rows[0].count),
+        newContacts: Number(newC.rows[0].count),
+        totalMakers: Number(totM.rows[0].count),
+        pendingMakers: Number(pendM.rows[0].count),
+        approvedMakers: Number(appM.rows[0].count),
+        rejectedMakers: Number(rejM.rows[0].count)
       }
     });
   } catch (error) {
@@ -135,7 +146,7 @@ function escapeCsvCell(cell) {
 }
 
 // GET /api/admin/contacts
-router.get('/contacts', requireAdminAuth, (req, res) => {
+router.get('/contacts', requireAdminAuth, async (req, res) => {
   try {
     const { page = 1, limit = 20, status, search, export: isExport } = req.query;
 
@@ -154,7 +165,12 @@ router.get('/contacts', requireAdminAuth, (req, res) => {
     }
 
     if (isExport === 'true' || isExport === 'csv') {
-      const records = db.prepare(`SELECT * ${baseQuery} ORDER BY created_at DESC`).all(...params);
+      const recordsRs = await db.execute({
+        sql: `SELECT * ${baseQuery} ORDER BY created_at DESC`,
+        args: params
+      });
+      const records = recordsRs.rows;
+
       const headers = ['ID', 'Full Name', 'Company', 'Email', 'Phone', 'Address', 'Message', 'Status', 'Created At'];
       const rows = records.map(r => [
         escapeCsvCell(r.id),
@@ -174,14 +190,21 @@ router.get('/contacts', requireAdminAuth, (req, res) => {
       return res.send(csvContent);
     }
 
-    const countRow = db.prepare(`SELECT COUNT(*) as count ${baseQuery}`).get(...params);
-    const total = countRow.count;
+    const countRs = await db.execute({
+      sql: `SELECT COUNT(*) as count ${baseQuery}`,
+      args: params
+    });
+    const total = Number(countRs.rows[0].count);
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
     const offset = (pageNum - 1) * limitNum;
 
-    const items = db.prepare(`SELECT * ${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(...params, limitNum, offset);
+    const itemsRs = await db.execute({
+      sql: `SELECT * ${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      args: [...params, limitNum, offset]
+    });
+    const items = itemsRs.rows;
 
     return res.json({
       success: true,
@@ -202,7 +225,7 @@ router.get('/contacts', requireAdminAuth, (req, res) => {
 });
 
 // PATCH /api/admin/contacts/:id
-router.patch('/contacts/:id', requireAdminAuth, (req, res) => {
+router.patch('/contacts/:id', requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body || {};
@@ -215,14 +238,20 @@ router.patch('/contacts/:id', requireAdminAuth, (req, res) => {
       });
     }
 
-    const result = db.prepare('UPDATE contact_submissions SET status = ? WHERE id = ?').run(status, id);
+    const result = await db.execute({
+      sql: 'UPDATE contact_submissions SET status = ? WHERE id = ?',
+      args: [status, id]
+    });
 
-    if (result.changes === 0) {
+    if (result.rowsAffected === 0) {
       return res.status(404).json({ success: false, error: 'Contact submission not found' });
     }
 
-    const updated = db.prepare('SELECT * FROM contact_submissions WHERE id = ?').get(id);
-    return res.json({ success: true, data: updated });
+    const updatedRs = await db.execute({
+      sql: 'SELECT * FROM contact_submissions WHERE id = ?',
+      args: [id]
+    });
+    return res.json({ success: true, data: updatedRs.rows[0] });
   } catch (error) {
     console.error('Error updating contact status:', error);
     return res.status(500).json({ success: false, error: 'Failed to update contact submission' });
@@ -230,12 +259,15 @@ router.patch('/contacts/:id', requireAdminAuth, (req, res) => {
 });
 
 // DELETE /api/admin/contacts/:id
-router.delete('/contacts/:id', requireAdminAuth, (req, res) => {
+router.delete('/contacts/:id', requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const result = db.prepare('DELETE FROM contact_submissions WHERE id = ?').run(id);
+    const result = await db.execute({
+      sql: 'DELETE FROM contact_submissions WHERE id = ?',
+      args: [id]
+    });
 
-    if (result.changes === 0) {
+    if (result.rowsAffected === 0) {
       return res.status(404).json({ success: false, error: 'Contact submission not found' });
     }
 
@@ -247,7 +279,7 @@ router.delete('/contacts/:id', requireAdminAuth, (req, res) => {
 });
 
 // GET /api/admin/makers
-router.get('/makers', requireAdminAuth, (req, res) => {
+router.get('/makers', requireAdminAuth, async (req, res) => {
   try {
     const { page = 1, limit = 20, status, role, search, export: isExport } = req.query;
 
@@ -271,7 +303,12 @@ router.get('/makers', requireAdminAuth, (req, res) => {
     }
 
     if (isExport === 'true' || isExport === 'csv') {
-      const records = db.prepare(`SELECT * ${baseQuery} ORDER BY created_at DESC`).all(...params);
+      const recordsRs = await db.execute({
+        sql: `SELECT * ${baseQuery} ORDER BY created_at DESC`,
+        args: params
+      });
+      const records = recordsRs.rows;
+
       const headers = ['ID', 'Full Name', 'Phone', 'Email', 'Role', 'Custom Role', 'Status', 'Admin Note', 'Created At'];
       const rows = records.map(r => [
         escapeCsvCell(r.id),
@@ -291,14 +328,21 @@ router.get('/makers', requireAdminAuth, (req, res) => {
       return res.send(csvContent);
     }
 
-    const countRow = db.prepare(`SELECT COUNT(*) as count ${baseQuery}`).get(...params);
-    const total = countRow.count;
+    const countRs = await db.execute({
+      sql: `SELECT COUNT(*) as count ${baseQuery}`,
+      args: params
+    });
+    const total = Number(countRs.rows[0].count);
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
     const offset = (pageNum - 1) * limitNum;
 
-    const items = db.prepare(`SELECT * ${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(...params, limitNum, offset);
+    const itemsRs = await db.execute({
+      sql: `SELECT * ${baseQuery} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      args: [...params, limitNum, offset]
+    });
+    const items = itemsRs.rows;
 
     return res.json({
       success: true,
@@ -319,7 +363,7 @@ router.get('/makers', requireAdminAuth, (req, res) => {
 });
 
 // PATCH /api/admin/makers/:id
-router.patch('/makers/:id', requireAdminAuth, (req, res) => {
+router.patch('/makers/:id', requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, admin_note, adminNote } = req.body || {};
@@ -351,14 +395,20 @@ router.patch('/makers/:id', requireAdminAuth, (req, res) => {
     }
 
     params.push(id);
-    const result = db.prepare(`UPDATE maker_registrations SET ${updates.join(', ')} WHERE id = ?`).run(...params);
+    const result = await db.execute({
+      sql: `UPDATE maker_registrations SET ${updates.join(', ')} WHERE id = ?`,
+      args: params
+    });
 
-    if (result.changes === 0) {
+    if (result.rowsAffected === 0) {
       return res.status(404).json({ success: false, error: 'Maker registration not found' });
     }
 
-    const updated = db.prepare('SELECT * FROM maker_registrations WHERE id = ?').get(id);
-    return res.json({ success: true, data: updated });
+    const updatedRs = await db.execute({
+      sql: 'SELECT * FROM maker_registrations WHERE id = ?',
+      args: [id]
+    });
+    return res.json({ success: true, data: updatedRs.rows[0] });
   } catch (error) {
     console.error('Error updating maker registration:', error);
     return res.status(500).json({ success: false, error: 'Failed to update maker registration' });
@@ -366,12 +416,15 @@ router.patch('/makers/:id', requireAdminAuth, (req, res) => {
 });
 
 // DELETE /api/admin/makers/:id
-router.delete('/makers/:id', requireAdminAuth, (req, res) => {
+router.delete('/makers/:id', requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const result = db.prepare('DELETE FROM maker_registrations WHERE id = ?').run(id);
+    const result = await db.execute({
+      sql: 'DELETE FROM maker_registrations WHERE id = ?',
+      args: [id]
+    });
 
-    if (result.changes === 0) {
+    if (result.rowsAffected === 0) {
       return res.status(404).json({ success: false, error: 'Maker registration not found' });
     }
 

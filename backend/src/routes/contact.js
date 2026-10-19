@@ -6,7 +6,7 @@ import { validateEmail, validatePhone, sanitizeString } from '../config/constant
 const router = Router();
 
 // POST /api/contact
-router.post('/contact', (req, res) => {
+router.post('/contact', async (req, res) => {
   try {
     const { fullname, full_name, company, email, country, phone, address, message } = req.body || {};
 
@@ -58,23 +58,24 @@ router.post('/contact', (req, res) => {
     const createdAt = new Date().toISOString();
     const status = 'new';
 
-    const stmt = db.prepare(`
-      INSERT INTO contact_submissions (
-        id, full_name, company, email, phone, address, message, status, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      id,
-      resolvedName,
-      resolvedCompany,
-      resolvedEmail,
-      combinedPhone,
-      resolvedAddress,
-      resolvedMessage,
-      status,
-      createdAt
-    );
+    await db.execute({
+      sql: `
+        INSERT INTO contact_submissions (
+          id, full_name, company, email, phone, address, message, status, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      args: [
+        id,
+        resolvedName,
+        resolvedCompany,
+        resolvedEmail,
+        combinedPhone,
+        resolvedAddress,
+        resolvedMessage,
+        status,
+        createdAt
+      ]
+    });
 
     return res.status(201).json({
       success: true,

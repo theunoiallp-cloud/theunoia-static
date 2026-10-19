@@ -7,24 +7,25 @@ export async function setAdminPassword(newPassword) {
     throw new Error('Password must be a non-empty string');
   }
 
-  initDatabase();
+  await initDatabase();
   const saltRounds = 12;
   const hash = await bcrypt.hash(newPassword, saltRounds);
   const now = new Date().toISOString();
 
   // Upsert the single admin auth record (id = 1)
-  const stmt = db.prepare(`
-    INSERT INTO admin_auth (id, password_hash, updated_at)
-    VALUES (1, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-      password_hash = excluded.password_hash,
-      updated_at = excluded.updated_at
-  `);
-
-  stmt.run(hash, now);
+  await db.execute({
+    sql: `
+      INSERT INTO admin_auth (id, password_hash, updated_at)
+      VALUES (1, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        password_hash = excluded.password_hash,
+        updated_at = excluded.updated_at
+    `,
+    args: [hash, now]
+  });
 
   // Invalidate any active sessions on password change for security
-  db.prepare('DELETE FROM sessions').run();
+  await db.execute('DELETE FROM sessions');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('set-admin-password.js')) {
@@ -36,7 +37,7 @@ if (process.argv[1] && process.argv[1].endsWith('set-admin-password.js')) {
 
   setAdminPassword(pwd)
     .then(() => {
-      console.log('Admin password hash successfully updated in SQLite database.');
+      console.log('Admin password hash successfully updated in database.');
       process.exit(0);
     })
     .catch((err) => {

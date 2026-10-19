@@ -6,7 +6,7 @@ import { VALID_ROLES, validateEmail, validatePhone, sanitizeString } from '../co
 const router = Router();
 
 // POST /api/maker
-router.post('/maker', (req, res) => {
+router.post('/maker', async (req, res) => {
   try {
     const { fullname, full_name, phone, country, email, role, custom_role, customRole } = req.body || {};
 
@@ -61,22 +61,23 @@ router.post('/maker', (req, res) => {
     const createdAt = new Date().toISOString();
     const status = 'pending_review';
 
-    const stmt = db.prepare(`
-      INSERT INTO maker_registrations (
-        id, full_name, phone, email, role, custom_role, status, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      id,
-      resolvedName,
-      combinedPhone,
-      resolvedEmail,
-      resolvedRole,
-      resolvedRole === 'Other' ? resolvedCustomRole : null,
-      status,
-      createdAt
-    );
+    await db.execute({
+      sql: `
+        INSERT INTO maker_registrations (
+          id, full_name, phone, email, role, custom_role, status, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      args: [
+        id,
+        resolvedName,
+        combinedPhone,
+        resolvedEmail,
+        resolvedRole,
+        resolvedRole === 'Other' ? resolvedCustomRole : null,
+        status,
+        createdAt
+      ]
+    });
 
     return res.status(201).json({
       success: true,
