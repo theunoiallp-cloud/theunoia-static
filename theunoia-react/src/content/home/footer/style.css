@@ -1,0 +1,35 @@
+/* ===== Footer ===== */
+#ft2{background:#14213D;color:#fff;font-family:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+#ft2 *{box-sizing:border-box}
+#ft2 a{color:inherit;text-decoration:none}
+#ft2 .f2-in{max-width:1100px;margin:0 auto;padding:56px 24px 120px}
+#ft2 .f2-top{display:grid;grid-template-columns:1fr 1.45fr;gap:40px}
+#ft2 .f2-big{display:flex;flex-direction:column;align-items:flex-start}
+#ft2 .f2-big a{font-size:clamp(19px,1.9vw,25px);font-weight:400;line-height:1.24;letter-spacing:-.01em;transition:color .2s,transform .2s}
+#ft2 .f2-big a:hover{color:#C9A227;transform:translateX(4px)}
+#ft2 .f2-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px 40px;align-content:start}
+#ft2 h4{margin:0 0 10px;font-size:14px;font-weight:700;letter-spacing:0}
+#ft2 .f2-grid p{margin:0;font-size:12px;line-height:1.6;color:#d6dbe6}
+#ft2 .f2-grid p a{color:#fff;text-decoration:underline;text-underline-offset:2px}
+#ft2 .f2-grid p a:hover{color:#C9A227}
+#ft2 .f2-gap{margin-top:14px!important}
+#ft2 .f2-social{display:flex;gap:10px}
+#ft2 .f2-social a{width:24px;height:24px;display:grid;place-items:center;color:#fff;transition:color .2s}
+#ft2 .f2-social a:hover{color:#C9A227}
+#ft2 .f2-social svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#ft2 .f2-rule{border:0;border-top:1px solid rgba(255,255,255,.16);margin:44px 0 28px}
+#ft2 .f2-bottom{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+#ft2 .f2-bottom p{margin:0;font-size:12px;color:#e5e5e5}
+#ft2 .f2-tiny{font-size:10px!important;color:#a3a3a3!important;margin-top:6px!important}
+#ft2 .f2-heart{color:#C65D3B}
+#ft2 .f2-legal{display:flex;gap:10px;font-size:11px;color:#d4d4d4;padding-top:4px;flex-wrap:wrap}
+#ft2 .f2-legal span{color:#737373}
+#ft2 .f2-legal a:hover{color:#C9A227}
+#ft2 a:focus-visible{outline:2px solid #C9A227;outline-offset:3px}
+@media (max-width:760px){
+ #ft2 .f2-in{padding:44px 20px 64px}
+ #ft2 .f2-top{grid-template-columns:1fr;gap:36px}
+ #ft2 .f2-grid{gap:28px 24px}
+ #ft2 .f2-bottom{flex-direction:column}
+}
+@media (max-width:400px){#ft2 .f2-grid{grid-template-columns:1fr}}

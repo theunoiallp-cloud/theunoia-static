@@ -1,0 +1,9 @@
+{
+ "id": "home-hero",
+ "root": {
+  "tag": "div",
+  "attrs": {
+   "id": "home-hero"
+  }
+ }
+}

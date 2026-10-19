@@ -1,0 +1,11 @@
+{
+ "sheet": "Inspirations",
+ "id": "insp",
+ "root": {
+  "tag": "section",
+  "attrs": {
+   "id": "insp",
+   "aria-label": "Our Inspirations"
+  }
+ }
+}

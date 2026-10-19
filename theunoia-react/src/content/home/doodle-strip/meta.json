@@ -1,0 +1,9 @@
+{
+ "id": "ft",
+ "root": {
+  "tag": "footer",
+  "attrs": {
+   "id": "ft"
+  }
+ }
+}

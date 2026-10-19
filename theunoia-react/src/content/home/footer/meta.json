@@ -1,0 +1,10 @@
+{
+ "id": "ft2",
+ "root": {
+  "tag": "footer",
+  "attrs": {
+   "id": "ft2",
+   "aria-label": "Site footer"
+  }
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "title": "THEUNOiA · Where young talent builds the future",
+ "order": [
+  "hero",
+  "particle-story",
+  "meet-theunoia",
+  "aim-vision",
+  "luna",
+  "products",
+  "inspirations",
+  "squad",
+  "independence",
+  "doodle-strip",
+  "footer"
+ ],
+ "sheets": {
+  "tu": "Meet THEUNOiA",
+  "vmx": "Aim & Vision",
+  "luna": "Luna",
+  "prod": "Products",
+  "insp": "Inspirations",
+  "sq": "The Squad",
+  "sd": "Independence"
+ }
+}

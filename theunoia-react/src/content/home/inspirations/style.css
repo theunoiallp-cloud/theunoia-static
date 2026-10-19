@@ -1,0 +1,45 @@
+/* ===== Our Inspirations ===== */
+@keyframes in-fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes in-fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes in-rise{from{opacity:0;transform:translateY(80px)}to{opacity:1;transform:none}}
+@keyframes in-drift{from{opacity:0;transform:translateX(-60px)}to{opacity:.07;transform:none}}
+#insp .in-hero>:nth-child(1){animation:in-drift 2s ease-out .9s both}
+#insp .in-hero>:nth-child(2){animation:in-fadeIn .8s ease-out .1s both}
+#insp .in-hero h1>span{animation:in-fadeUp .9s cubic-bezier(.2,.8,.2,1) both}
+#insp .in-hero h1>span:nth-child(1){animation-delay:.3s}
+#insp .in-hero h1>span:nth-child(2){animation-delay:.5s}
+#insp .in-hero h1>span:nth-child(3){animation-delay:.7s}
+@keyframes in-scissor{from{clip-path:polygon(0% -4%, 100% -4%, 100.00% -4.60%, 95.83% -1.40%, 91.67% -4.60%, 87.50% -1.40%, 83.33% -4.60%, 79.17% -1.40%, 75.00% -4.60%, 70.83% -1.40%, 66.67% -4.60%, 62.50% -1.40%, 58.33% -4.60%, 54.17% -1.40%, 50.00% -4.60%, 45.83% -1.40%, 41.67% -4.60%, 37.50% -1.40%, 33.33% -4.60%, 29.17% -1.40%, 25.00% -4.60%, 20.83% -1.40%, 16.67% -4.60%, 12.50% -1.40%, 8.33% -4.60%, 4.17% -1.40%, 0.00% -4.60%)}to{clip-path:polygon(0% -4%, 100% -4%, 100.00% 102.40%, 95.83% 105.60%, 91.67% 102.40%, 87.50% 105.60%, 83.33% 102.40%, 79.17% 105.60%, 75.00% 102.40%, 70.83% 105.60%, 66.67% 102.40%, 62.50% 105.60%, 58.33% 102.40%, 54.17% 105.60%, 50.00% 102.40%, 45.83% 105.60%, 41.67% 102.40%, 37.50% 105.60%, 33.33% 102.40%, 29.17% 105.60%, 25.00% 102.40%, 20.83% 105.60%, 16.67% 102.40%, 12.50% 105.60%, 8.33% 102.40%, 4.17% 105.60%, 0.00% 102.40%)}}
+@keyframes in-lift{0%{transform:translateY(0) rotate(0) scale(1)}35%{transform:translateY(-18px) rotate(-2.2deg) scale(1.02)}70%{transform:translateY(4px) rotate(.8deg) scale(1)}100%{transform:none}}
+@keyframes in-flutter{0%,100%{transform:rotate(0) translateY(0)}50%{transform:rotate(-.6deg) translateY(-5px)}}
+#insp .paper{transform-origin:50% 100%;animation:in-lift 1s cubic-bezier(.3,.7,.3,1) 2.3s both, in-flutter 5.5s ease-in-out 3.4s infinite}
+#insp .cut{animation:in-scissor 1.5s steps(26,end) .8s both}
+#insp .in-hero>:nth-child(5),#insp .in-hero>:nth-child(6){animation:in-fadeUp .9s ease-out 1.4s both}
+#insp .in-hero>:nth-child(6){animation-delay:1.55s}
+@media (prefers-reduced-motion:reduce){#insp .in-hero *,#insp .in-hero>*{animation:none!important}
+#insp .cut{clip-path:none!important}
+}
+
+
+#insp{position:relative;background:#BFB096;display:flex;justify-content:center;overflow:hidden}
+#insp a{color:#14213D}#insp a:hover{color:#A9583A}
+#insp .in-fit{position:relative;width:min(100%,1440px);aspect-ratio:1440/960;overflow:hidden}
+#insp .in-hero{transform-origin:0 0}
+/* the entrance plays when the section scrolls into view, not on page load */
+#insp:not(.play) .in-hero *,#insp:not(.play) .in-hero>*{animation-play-state:paused!important}
+@media (max-width:760px){
+  #insp .in-fit{aspect-ratio:auto;width:100%}
+  #insp .in-hero{transform:none!important;width:100%!important;height:auto!important;padding:28px 0 0;display:flex;flex-direction:column;align-items:center}
+  #insp .in-head{position:relative!important;width:100%!important;height:auto!important;padding:0 20px!important}
+  #insp .in-title{position:relative!important;width:100%!important;height:auto!important;font-size:42px!important}
+  #insp .in-names{position:relative!important;top:auto!important;width:100%!important;margin:14px 0 0!important;padding:0 16px;box-sizing:border-box;
+    font-size:clamp(26px,8vw,34px)!important;line-height:1.35!important;white-space:normal!important;text-align:center}
+  #insp .in-names>span{display:block}
+  #insp .in-note{position:relative!important;left:auto!important;top:auto!important;width:auto!important;padding:0 22px;margin-top:22px;box-sizing:border-box}
+  #insp .in-note p{font-size:14px!important;line-height:21px!important;text-indent:0!important;padding-top:62px!important}
+  #insp .in-l{order:4}#insp .in-r{order:5;margin-bottom:28px}
+  #insp .in-paper{position:relative!important;left:auto!important;top:auto!important;width:84%!important;height:auto!important;margin-top:26px;order:3}
+  #insp .in-paper img{width:100%!important;height:auto!important}
+  #insp .in-note img{left:22px!important}
+  #insp .in-bgword{top:auto!important;bottom:0;width:100%!important;font-size:120px!important;line-height:1!important}
+}

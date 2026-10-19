@@ -1,0 +1,52 @@
+/* ===== Son Daven ===== */
+#sd{
+    --midnight-navy: #0F1B2D;
+    --heritage-gold: #C9A55C;
+    --terracotta:    #C2653F;
+    --ivory-white:   #F7F2E8;
+  }
+#sd .tn-hero{ position: relative; overflow: hidden; height: 100vh; height: 100svh; background: var(--midnight-navy); }
+#sd .tn-video{ position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 0 0; will-change: transform; }
+#sd .tn-bg-anim{ position: absolute; top: 0; left: -45%; width: 190%; height: 100%; max-width: none; display: block;
+                 -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 9%); mask-image: linear-gradient(180deg, transparent 0, #000 9%); }
+#sd .tn-cloud{ position: absolute; display: block; height: auto; opacity: 0; pointer-events: none; transition: opacity 2s ease; }
+#sd .tn-cloud--1{ animation: sd-tn-drift 26s ease-in-out infinite alternate; }
+#sd .tn-cloud--2{ animation: sd-tn-drift 30s ease-in-out -9s infinite alternate-reverse; }
+#sd .tn-hero.clouds-in .tn-cloud{ opacity: 1; }
+@keyframes sd-tn-drift{ from { transform: translateX(-2.5vw); } to { transform: translateX(2.5vw); } }
+#sd .tn-birds{ z-index: 2; filter: brightness(1.2) drop-shadow(0 0 2px #0F1B2D) drop-shadow(0 0 1px #0F1B2D); position: absolute; display: block; transform: rotate(5deg); opacity: 0; pointer-events: none; transition: opacity 1.6s ease; }
+#sd .tn-hero.birds-in .tn-birds{ opacity: 1; }
+#sd .tn-tagline{
+    position: absolute; left: 50%; margin: 0; transform: translate(-50%, -50%) translateY(10px);
+    font-family: Cinzel, 'Times New Roman', serif; font-weight: 600; white-space: nowrap;
+    font-size: var(--tag-size, 26px); letter-spacing: .16em; text-indent: .16em;   
+    color: var(--heritage-gold); text-shadow: 0 2px 12px rgba(15,27,45,.9);
+    opacity: 0; transition: opacity 1.4s ease, transform 1.4s cubic-bezier(.22,.8,.25,1), letter-spacing 1.8s ease;
+    pointer-events: none;
+  }
+#sd .tn-tagline span{ color: var(--terracotta); }
+#sd .tn-tagline{ z-index: 3; }
+#sd .tn-hero.tag-in .tn-tagline{ opacity: 1; transform: translate(-50%, -50%); }
+#sd .tn-pair{ position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: 1920 / 517; }
+#sd .tn-hand{ position: absolute; display: block; height: auto; pointer-events: none; user-select: none;
+             filter: drop-shadow(0 10px 14px rgba(0,0,0,.45)); will-change: transform; }
+#sd .tn-hand--left{ left: -14.54%;  top: 7%; width: 64.73%; transform: translateX(-100vw);
+                    -webkit-mask-image: linear-gradient(90deg, transparent, #000 16%); mask-image: linear-gradient(90deg, transparent, #000 16%); }
+#sd .tn-hand--right{ right: -26.44%; top: 0;  width: 76.40%; transform: translateX(100vw);
+                    -webkit-mask-image: linear-gradient(270deg, transparent, #000 6%); mask-image: linear-gradient(270deg, transparent, #000 6%); }
+#sd .tn-hero.hands-in .tn-hand--left{ animation: sd-tn-reach-left  4.5s cubic-bezier(.33,1,.68,1) forwards; }
+#sd .tn-hero.hands-in .tn-hand--right{ animation: sd-tn-reach-right 4.5s cubic-bezier(.33,1,.68,1) forwards; }
+@keyframes sd-tn-reach-left{ from { transform: translateX(-100vw); } to { transform: translateX(0); } }
+@keyframes sd-tn-reach-right{ from { transform: translateX(100vw); }  to { transform: translateX(0); } }
+#sd .tn-spark{
+    position: absolute; left: 50.3%; top: 53%; width: 12%; aspect-ratio: 1; border-radius: 50%;
+    transform: translate(-50%,-50%) scale(.2); opacity: 0; mix-blend-mode: screen; pointer-events: none;
+    background: radial-gradient(circle, rgba(247,242,232,.95) 0%, rgba(201,165,92,.75) 22%, rgba(194,101,63,.35) 45%, rgba(194,101,63,0) 70%);
+  }
+#sd .tn-hero.hands-in .tn-spark{ animation: sd-tn-spark-in .9s ease-out 4.3s forwards, sd-tn-spark-pulse 3.2s ease-in-out 5.2s infinite; }
+@keyframes sd-tn-spark-in{ 0% { opacity: 0; transform: translate(-50%,-50%) scale(.2); } 60% { opacity: 1; transform: translate(-50%,-50%) scale(1.25); } 100% { opacity: .8; transform: translate(-50%,-50%) scale(1); } }
+@keyframes sd-tn-spark-pulse{ 0%,100% { opacity: .8; transform: translate(-50%,-50%) scale(1); } 50% { opacity: .45; transform: translate(-50%,-50%) scale(.82); } }
+
+  
+
+#sd video.tn-bg-anim{object-fit:fill}

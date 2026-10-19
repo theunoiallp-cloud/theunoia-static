@@ -1,0 +1,11 @@
+{
+ "sheet": "The Squad",
+ "id": "sq",
+ "root": {
+  "tag": "section",
+  "attrs": {
+   "id": "sq",
+   "aria-label": "Meet the Squad"
+  }
+ }
+}
