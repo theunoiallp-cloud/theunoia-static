@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configure Turso or local SQLite
+const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
 const tursoUrl = process.env.TURSO_DATABASE_URL;
 const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
 
@@ -19,14 +19,20 @@ if (tursoUrl) {
     authToken: tursoAuthToken
   };
 } else {
-  // Local development / fallback to SQLite file
+  // If running in production or on Vercel, DO NOT silently fall back to ephemeral SQLite!
+  if (isProduction) {
+    throw new Error(
+      'FATAL: TURSO_DATABASE_URL is not configured in production environment. Refusing to fall back to ephemeral SQLite.'
+    );
+  }
+
+  // Local development fallback to SQLite file
   const defaultDbPath = path.resolve(__dirname, '../../data/theunoia.db');
   const dbPath = process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : defaultDbPath;
   const dbDir = path.dirname(dbPath);
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
   }
-  // Convert Windows path separators for libSQL file URL
   const normalizedPath = dbPath.replace(/\\/g, '/');
   clientConfig = {
     url: `file:${normalizedPath}`
