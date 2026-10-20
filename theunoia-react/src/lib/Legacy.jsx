@@ -12,20 +12,24 @@ export function Legacy({ name, root, markup, css, scripts = [] }) {
   const ref = useRef(null);
   const Tag = root?.tag || 'div';
 
-  // markup and attributes go in before paint, so the scripts find their elements
+  // Synchronize dynamic attributes if root changes on client
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (root) Object.entries(root.attrs || {}).forEach(([k, v]) => el.setAttribute(k, v));
-    else el.style.display = 'contents';      // no outer element: behave as if the children sat here directly
-    el.innerHTML = markup;
-  }, [markup, root]);
+    else el.style.display = 'contents';
+  }, [root]);
 
   useEffect(() => runLegacy(scripts, { name }), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
-      <Tag ref={ref} />
+      <Tag
+        ref={ref}
+        {...(root?.attrs || {})}
+        style={!root ? { display: 'contents' } : undefined}
+        dangerouslySetInnerHTML={{ __html: markup }}
+      />
       {css ? <style data-block={name} dangerouslySetInnerHTML={{ __html: css }} /> : null}
     </>
   );

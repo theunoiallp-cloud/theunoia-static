@@ -1,6 +1,6 @@
-# THEUNOiA — Full Stack Project
+# THEUNOiA — Modern Web & Supabase Integration
 
-Complete self-hosted backend, persistent SQLite database, and administrative portal paired with the THEUNOiA React + Vite frontend.
+High-performance, search-crawlable React + Vite web platform paired with official **Supabase** cloud database storage.
 
 ---
 
@@ -8,110 +8,87 @@ Complete self-hosted backend, persistent SQLite database, and administrative por
 
 ```
 theunoia-react/
-├── backend/                  # Self-hosted Node.js + Express + SQLite backend
-│   ├── src/
-│   │   ├── config/           # Database schema & initialization
-│   │   ├── middleware/       # Session-based auth & validation
-│   │   ├── routes/           # /api/contact, /api/maker, /api/admin
-│   │   ├── scripts/          # Password management & SQLite backups
-│   │   └── server.js         # Server entry point
-│   ├── .env.example          # Environment variable template
-│   └── package.json
+├── supabase/
+│   └── schema.sql            # Version-controlled Supabase SQL schema & Row Level Security (RLS) policies
 │
-├── theunoia-react/           # React + Vite frontend (Vercel-ready)
+├── theunoia-react/           # React + Vite frontend (Vercel-ready & pre-rendered)
+│   ├── public/               # Static assets, robots.txt, sitemap.xml, llms.txt
+│   ├── scripts/
+│   │   └── prerender.js      # Build-time SSG/prerendering pipeline
 │   ├── src/
-│   │   ├── pages/            # Public pages, BecomeMaker, Admin, AdminLogin
-│   │   ├── config/           # API client configuration
+│   │   ├── lib/
+│   │   │   └── supabase.js   # Official Supabase JS client & form submission helpers
+│   │   ├── pages/            # Public pages (Home, Story, Team, Hivh, Hunhar, Blog, Contact, BecomeMaker, NotFound)
 │   │   └── ...
-│   ├── .env.example          # Frontend API base URL template
-│   ├── vercel.json           # Vercel deployment & client-side routing rules
+│   ├── .env.example          # Supabase environment variables template
+│   ├── vercel.json           # Vercel deployment configuration with cleanUrls
 │   └── package.json
 │
-├── .gitignore                # Protects secrets (.env) and databases (*.db)
+├── .gitignore                # Protects secrets (.env) and environment files
+├── .env.example              # Project environment variables reference
+├── vercel.json               # Root Vercel deployment configuration
 └── README.md
 ```
 
 ---
 
-## 1. Backend Setup & Run
+## 1. Database Setup (Supabase)
 
-### Prerequisites
-- Node.js (v18+)
-- npm
+Supabase is the sole database powering the application. Submissions are stored in PostgreSQL tables secured with Row Level Security (RLS).
 
-### Installation
-```bash
-cd backend
-npm install
-```
+### Schema Setup
+1. Open your [Supabase Dashboard](https://supabase.com/dashboard).
+2. Go to **SQL Editor** -> **New Query**.
+3. Copy and run the contents of [`supabase/schema.sql`](./supabase/schema.sql).
 
-### Environment Configuration
-Copy the example environment configuration:
-```bash
-cp .env.example .env
-```
-Edit `.env` as appropriate:
-- `PORT`: Server port (default: `4000`)
-- `DATABASE_PATH`: Path to SQLite database file (e.g., `./data/theunoia.db`)
-- `BACKUP_PATH`: Path for database backups (e.g., `./backups`)
-- `CORS_ALLOWED_ORIGINS`: Comma-separated list of allowed frontend origins (e.g., `http://localhost:5173,https://theunoia.com`)
-- `ADMIN_INITIAL_PASSWORD`: Initial admin password seeded on first database creation.
-
-### Running Backend
-```bash
-# Start backend server
-node src/server.js
-```
-The backend starts at `http://localhost:4000`.
-Health check: `http://localhost:4000/api/health`
-
-### Admin Management
-To update the admin password:
-```bash
-node src/scripts/set-admin-password.js "<new-secure-password>"
-```
-
-### Backup & Restore
-- **Backup**: `node src/scripts/backup.js`
-- **Restore**: `node src/scripts/restore.js <path-to-backup.db>`
+This initializes:
+- `contact_submissions`: Stores enquiries from `/contact` (`full_name`, `company`, `email`, `phone`, `address`, `message`, `status`, `created_at`).
+- `team_member_applications`: Stores applications from `/become-a-maker` (`full_name`, `email`, `phone`, `role`, `custom_role`, `status`, `created_at`).
+- **Row Level Security (RLS)**: Anonymous visitors are granted INSERT-only permissions. Anonymous SELECT, UPDATE, and DELETE are strictly disabled, preventing unauthorized data access.
 
 ---
 
-## 2. Frontend Setup & Run
+## 2. Environment Configuration
+
+Copy the example configuration file:
+```bash
+cp theunoia-react/.env.example theunoia-react/.env
+```
+
+Retrieve your credentials from **Supabase Dashboard** -> **Project Settings** -> **API**:
+- `VITE_SUPABASE_URL`: Your Supabase Project URL (`https://<project-ref>.supabase.co`)
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: Your Supabase `anon` / `public` API key
+
+> **Security Note:** Never place your Supabase `service_role` secret key in frontend environment variables or client bundles.
+
+---
+
+## 3. Development & Production Build
 
 ### Installation
 ```bash
-cd theunoia-react
-npm install
+npm install --prefix theunoia-react
 ```
 
-### Environment Configuration
-Copy the example environment configuration:
+### Run Locally
 ```bash
-cp .env.example .env
-```
-Ensure `VITE_API_BASE_URL` points to your backend instance:
-- Local development: `http://localhost:4000`
-- Production VPS: `https://api.yourdomain.com`
-
-### Running Frontend
-```bash
-npm run dev
+npm run dev --prefix theunoia-react
 ```
 Accessible by default at `http://localhost:5173`.
 
+### Production Build
+```bash
+npm run build
+```
+Executes Vite production build and the automated prerendering pipeline (`scripts/prerender.js`), generating full static HTML pages for all indexable routes in `theunoia-react/dist`.
+
 ---
 
-## 3. Production Deployment Notes
+## 4. Production Deployment (Vercel)
 
-### Frontend (Vercel)
-- Set Root Directory to `theunoia-react` in Vercel project settings.
-- Add environment variable `VITE_API_BASE_URL` set to the backend API domain.
-- `vercel.json` handles Single Page App (SPA) client-side routing rewrites.
-
-### Backend (Linux VPS)
-- Deploy the `backend/` directory to a persistent Linux server (Ubuntu/Debian).
-- Use `pm2` or `systemd` to keep the Express server running continuously.
-- Put reverse proxy (Nginx or Caddy) in front with Let's Encrypt SSL/TLS.
-- Persist SQLite database on disk (`/var/lib/theunoia/theunoia.db`).
-- Configure a cron job for automated daily backups using `backend/src/scripts/backup.js`.
+1. Deploy repository to [Vercel](https://vercel.com).
+2. Configure **Environment Variables** in Vercel Project Settings:
+   - `VITE_SUPABASE_URL`: `https://<project-ref>.supabase.co`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY`: `<your-anon-key>`
+3. Build Command: `npm run build`
+4. Output Directory: `theunoia-react/dist`

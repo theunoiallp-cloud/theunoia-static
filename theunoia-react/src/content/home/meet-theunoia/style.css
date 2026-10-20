@@ -24,11 +24,11 @@
 /* ============ INTRO ============ */
 #tu .hero{position:absolute;left:50%;top:50%;z-index:20;padding:14px 26px;border-radius:40px;border:1.5px dashed transparent;transition:border-color .4s;transform-origin:50% 50%}
 #tu .hero.ring{border-color:#14213D}
-#tu .hero h1{margin:0;font-size:48px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;line-height:1}
-#tu .hero h1 span{display:inline-block;opacity:0;transform:translateY(14px);transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1.2)}
-#tu .hero.in h1 span{opacity:1;transform:none}
-#tu .hero h1 .i{color:#C9A24A;--x:#8590AD}
-#tu .hero h1 .o{text-align:center;overflow:visible}
+#tu .hero :is(h1, h2){margin:0;font-size:48px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;line-height:1}
+#tu .hero :is(h1, h2) span{display:inline-block;opacity:0;transform:translateY(14px);transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1.2)}
+#tu .hero.in :is(h1, h2) span{opacity:1;transform:none}
+#tu .hero :is(h1, h2) .i{color:#C9A24A;--x:#8590AD}
+#tu .hero :is(h1, h2) .o{text-align:center;overflow:visible}
 #tu .stickers{position:absolute;inset:0;z-index:10}
 #tu .stk{position:absolute;left:0;top:0;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;opacity:0;will-change:transform,opacity}
 #tu .stk.drag{cursor:grabbing;z-index:300!important;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18))}

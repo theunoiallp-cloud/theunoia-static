@@ -1,0 +1,26 @@
+# THEUNOiA
+
+> THEUNOiA LLP is a software development company based in Maharashtra, India. We build websites, web apps, digital platforms, and custom software for businesses and startups while empowering student makers.
+
+## Pages
+- [Home](https://www.theunoia.com/): Overview of THEUNOiA, mission, services, products, and vision
+- [Our Story](https://www.theunoia.com/story): The origin story of THEUNOiA and the philosophy of beautiful thinking
+- [Team](https://www.theunoia.com/team): The makers, departments, and leadership behind THEUNOiA
+- [Hivh](https://www.theunoia.com/hivh): Community hosting workshops, awareness drives, meetups, and campus visits across 16 cities
+- [Hunhar](https://www.theunoia.com/hunhar): Student-first freelancing ecosystem connecting emerging talent with real client projects
+- [Blog](https://www.theunoia.com/blog): Stories, freelancing insights, updates, and student resources
+- [Contact](https://www.theunoia.com/contact): Contact form, support, phone (+91 63742 14583), and email (howdy@theunoia.com)
+- [Become a Maker](https://www.theunoia.com/become-a-maker): Registration portal for designers, developers, and creators
+
+## Products & Ecosystem
+- **Hunhar**: Student freelancing platform where businesses post projects and skilled student makers submit proposals within transparent budgets.
+- **Hivh**: Grassroots youth community active in 16 cities fostering real-world technical skills and creative collaboration.
+- **Client Solutions**: Custom software development, digital platforms, IT infrastructure, and web applications built and launched for businesses and startups.
+
+## Contact Information
+- **Company**: THEUNOiA LLP
+- **Head Office**: Laxmi Nagar, Chandrapur, Maharashtra - 442401, India
+- **Email**: howdy@theunoia.com
+- **Phone**: +91 63742 14583
+- **Website**: https://www.theunoia.com
+- **Instagram**: https://www.instagram.com/theunoia_

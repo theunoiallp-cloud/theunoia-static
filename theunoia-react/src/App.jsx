@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Story from './pages/Story.jsx';
 import Team from './pages/Team.jsx';
@@ -8,7 +8,7 @@ import Hunhar from './pages/Hunhar.jsx';
 import Blog from './pages/Blog.jsx';
 import Contact from './pages/Contact.jsx';
 import BecomeMaker from './pages/BecomeMaker.jsx';
-import Admin from './pages/Admin.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 /** Opens each page at the top (or at its #anchor). */
 function ScrollManager() {
@@ -39,24 +39,28 @@ function LinkCatcher() {
   return null;
 }
 
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/story" element={<Story key="story" />} />
+      <Route path="/team" element={<Team key="team" />} />
+      <Route path="/hivh" element={<Hivh key="hivh" />} />
+      <Route path="/hunhar" element={<Hunhar key="hunhar" />} />
+      <Route path="/blog" element={<Blog key="blog" />} />
+      <Route path="/contact" element={<Contact key="contact" />} />
+      <Route path="/become-a-maker" element={<BecomeMaker key="become-a-maker" />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <ScrollManager />
       <LinkCatcher />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/story" element={<Story key="story" />} />
-        <Route path="/team" element={<Team key="team" />} />
-        <Route path="/hivh" element={<Hivh key="hivh" />} />
-        <Route path="/hunhar" element={<Hunhar key="hunhar" />} />
-        <Route path="/blog" element={<Blog key="blog" />} />
-        <Route path="/contact" element={<Contact key="contact" />} />
-        <Route path="/become-a-maker" element={<BecomeMaker key="become-a-maker" />} />
-        <Route path="/admin" element={<Admin key="admin" />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-
-      </Routes>
+      <AppRoutes />
     </BrowserRouter>
   );
 }

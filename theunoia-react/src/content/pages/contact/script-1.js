@@ -14,7 +14,7 @@ if (country && phone) {
   });
 }
 
-// Contact form submission directly to the backend
+// Contact form submission directly to Supabase
 const form = document.getElementById('contact-form');
 const status = document.getElementById('form-status');
 const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
@@ -32,12 +32,18 @@ if (form && status) {
     }
 
     const fd = new FormData(form);
+    const rawPhone = (fd.get('phone') || '').trim();
+    const selCountry = fd.get('country') || '+91';
+    let combinedPhone = rawPhone;
+    if (rawPhone && !rawPhone.startsWith('+')) {
+      combinedPhone = `${selCountry} ${rawPhone}`;
+    }
+
     const payload = {
       fullname: fd.get('fullname'),
       company: fd.get('company'),
       email: fd.get('email'),
-      country: fd.get('country'),
-      phone: fd.get('phone'),
+      phone: combinedPhone,
       address: fd.get('address'),
       message: fd.get('message')
     };
@@ -50,25 +56,22 @@ if (form && status) {
     status.style.color = '#14213D';
 
     try {
-      const apiBase = window.__THEUNOiA_API_BASE_URL__ || 'http://localhost:4000';
-      const res = await fetch(`${apiBase}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+      if (typeof window.__THEUNOiA_SUBMIT_CONTACT__ !== 'function') {
+        throw new Error('Supabase submission handler is not initialized. Please refresh the page.');
+      }
 
-      const data = await res.json().catch(() => ({}));
+      const res = await window.__THEUNOiA_SUBMIT_CONTACT__(payload);
 
-      if (res.ok && data.success) {
-        status.textContent = data.message || 'Thank you! Your message has been saved successfully.';
+      if (res && res.success) {
+        status.textContent = res.message || 'Thank you! Your message has been sent successfully.';
         status.style.color = '#2E7D32';
         form.reset();
       } else {
-        status.textContent = data.error || 'Failed to submit message. Please try again.';
+        status.textContent = (res && res.error) || 'Failed to submit message. Please try again.';
         status.style.color = '#B5543A';
       }
     } catch (err) {
-      status.textContent = 'Unable to connect to the server. Please check your internet connection or try again later.';
+      status.textContent = err.message || 'Unable to connect to database. Please check your connection or try again later.';
       status.style.color = '#B5543A';
     } finally {
       if (submitBtn) {

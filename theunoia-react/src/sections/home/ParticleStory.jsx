@@ -6,7 +6,9 @@ import script1 from '../../content/home/particle-story/script-1.js?raw';
 import * as THREE from 'three';
 
 // the particle scene was written for the global THREE (r128)
-window.THREE = THREE;
+if (typeof window !== 'undefined') {
+  window.THREE = THREE;
+}
 
 /** Slide 2: "Our Story" told by particles that form a new shape for each of the seven parts. */
 export default function ParticleStory() {

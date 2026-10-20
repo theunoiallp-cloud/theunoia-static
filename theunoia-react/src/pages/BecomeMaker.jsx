@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../config/api.js';
+import { submitTeamApplication } from '../lib/supabase.js';
 
 const ROLE_CATEGORIES = {
   'Engineering': [
@@ -115,18 +115,24 @@ export default function BecomeMaker() {
     setStatusMessage({ type: 'info', text: 'Submitting your registration...' });
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/maker`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const rawPhone = (formData.phone || '').trim();
+      let combinedPhone = rawPhone;
+      if (rawPhone && formData.country && !rawPhone.startsWith('+')) {
+        combinedPhone = `${formData.country} ${rawPhone}`;
+      }
+
+      const res = await submitTeamApplication({
+        fullname: formData.fullname,
+        email: formData.email,
+        phone: combinedPhone,
+        role: formData.role,
+        customRole: formData.customRole
       });
 
-      const data = await res.json().catch(() => ({}));
-
-      if (res.ok && data.success) {
+      if (res && res.success) {
         setStatusMessage({
           type: 'success',
-          text: data.message || 'Registration received! Our team will review your application.'
+          text: res.message || 'Registration received! Our team will review your application.'
         });
         setFormData({
           fullname: '',
@@ -139,13 +145,13 @@ export default function BecomeMaker() {
       } else {
         setStatusMessage({
           type: 'error',
-          text: data.error || 'Failed to submit registration. Please try again.'
+          text: (res && res.error) || 'Failed to submit registration. Please try again.'
         });
       }
-    } catch {
+    } catch (err) {
       setStatusMessage({
         type: 'error',
-        text: 'Unable to connect to the server. Please check your connection or try again later.'
+        text: err.message || 'Unable to connect to the database. Please check your connection or try again later.'
       });
     } finally {
       setLoading(false);

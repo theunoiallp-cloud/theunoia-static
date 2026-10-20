@@ -5,10 +5,10 @@
 @keyframes in-drift{from{opacity:0;transform:translateX(-60px)}to{opacity:.07;transform:none}}
 #insp .in-hero>:nth-child(1){animation:in-drift 2s ease-out .9s both}
 #insp .in-hero>:nth-child(2){animation:in-fadeIn .8s ease-out .1s both}
-#insp .in-hero h1>span{animation:in-fadeUp .9s cubic-bezier(.2,.8,.2,1) both}
-#insp .in-hero h1>span:nth-child(1){animation-delay:.3s}
-#insp .in-hero h1>span:nth-child(2){animation-delay:.5s}
-#insp .in-hero h1>span:nth-child(3){animation-delay:.7s}
+#insp .in-hero :is(h1, h2)>span{animation:in-fadeUp .9s cubic-bezier(.2,.8,.2,1) both}
+#insp .in-hero :is(h1, h2)>span:nth-child(1){animation-delay:.3s}
+#insp .in-hero :is(h1, h2)>span:nth-child(2){animation-delay:.5s}
+#insp .in-hero :is(h1, h2)>span:nth-child(3){animation-delay:.7s}
 @keyframes in-scissor{from{clip-path:polygon(0% -4%, 100% -4%, 100.00% -4.60%, 95.83% -1.40%, 91.67% -4.60%, 87.50% -1.40%, 83.33% -4.60%, 79.17% -1.40%, 75.00% -4.60%, 70.83% -1.40%, 66.67% -4.60%, 62.50% -1.40%, 58.33% -4.60%, 54.17% -1.40%, 50.00% -4.60%, 45.83% -1.40%, 41.67% -4.60%, 37.50% -1.40%, 33.33% -4.60%, 29.17% -1.40%, 25.00% -4.60%, 20.83% -1.40%, 16.67% -4.60%, 12.50% -1.40%, 8.33% -4.60%, 4.17% -1.40%, 0.00% -4.60%)}to{clip-path:polygon(0% -4%, 100% -4%, 100.00% 102.40%, 95.83% 105.60%, 91.67% 102.40%, 87.50% 105.60%, 83.33% 102.40%, 79.17% 105.60%, 75.00% 102.40%, 70.83% 105.60%, 66.67% 102.40%, 62.50% 105.60%, 58.33% 102.40%, 54.17% 105.60%, 50.00% 102.40%, 45.83% 105.60%, 41.67% 102.40%, 37.50% 105.60%, 33.33% 102.40%, 29.17% 105.60%, 25.00% 102.40%, 20.83% 105.60%, 16.67% 102.40%, 12.50% 105.60%, 8.33% 102.40%, 4.17% 105.60%, 0.00% 102.40%)}}
 @keyframes in-lift{0%{transform:translateY(0) rotate(0) scale(1)}35%{transform:translateY(-18px) rotate(-2.2deg) scale(1.02)}70%{transform:translateY(4px) rotate(.8deg) scale(1)}100%{transform:none}}
 @keyframes in-flutter{0%,100%{transform:rotate(0) translateY(0)}50%{transform:rotate(-.6deg) translateY(-5px)}}
