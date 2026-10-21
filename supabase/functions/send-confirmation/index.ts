@@ -141,8 +141,8 @@ serve(async (req) => {
       text = `Thank you for your interest in becoming a Maker | THEUNOiA\n\nHello ${safeName},\n\nWe have safely received your application details for the ${safeRole} track. Our team will review your application and contact you regarding next steps.\n\nReference: #${shortRef}\nEmail: ${safeEmail}\n\nIn camaraderie,\nThe THEUNOiA Squad\nhttps://www.theunoia.com`;
     }
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'THEUNOiA <howdy@theunoia.com>';
+    const resendApiKey = Deno.env.get('re_7en5yZpH_9f5mnrgQUmd5PPHjq7fvsFxZ');
+    const emailFrom = Deno.env.get('EMAIL_FROM') || 'THEUNOiA <noreply@theunoia.com>';
 
     if (!resendApiKey) {
       console.log(`[Edge Function: Simulated Mode] Confirmation for ${safeEmail}`);
