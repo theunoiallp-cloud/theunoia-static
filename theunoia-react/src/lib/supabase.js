@@ -63,7 +63,53 @@ export const supabase = isSupabaseConfigured
     };
 
 /**
- * Validates and submits a contact form message to Supabase.
+ * Generates a standard UUID v4 string.
+ * @returns {string}
+ */
+function generateUuid() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/**
+ * Dispatches a request to the protected serverless confirmation endpoint.
+ * Non-blocking: failures do not revert or misreport already-saved database rows.
+ *
+ * @param {Object} payload
+ * @returns {Promise<{ success: boolean, emailSent?: boolean, error?: string }>}
+ */
+async function dispatchConfirmationEmail(payload) {
+  try {
+    const response = await fetch('/api/send-confirmation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      console.warn(`[Confirmation API] Server returned status ${response.status}`);
+      return { success: false, error: `HTTP ${response.status}` };
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.warn('[Confirmation API Network Warning]', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Validates and submits a contact form message to Supabase, then triggers
+ * an automated confirmation email.
  *
  * @param {Object} payload
  * @param {string} payload.fullname
@@ -102,10 +148,13 @@ export async function submitContactForm({ fullname, company, email, phone, addre
     };
   }
 
+  const submissionId = generateUuid();
+
   const { error } = await supabase
     .from('contact_submissions')
     .insert([
       {
+        id: submissionId,
         full_name: cleanName,
         company: cleanCompany,
         email: cleanEmail,
@@ -124,6 +173,17 @@ export async function submitContactForm({ fullname, company, email, phone, addre
     };
   }
 
+  // Trigger automated confirmation email in the background
+  dispatchConfirmationEmail({
+    type: 'contact',
+    submissionId,
+    name: cleanName,
+    email: cleanEmail,
+    company: cleanCompany,
+    phone: cleanPhone,
+    message: cleanMessage
+  });
+
   return {
     success: true,
     message: 'Thank you! Your message has been sent successfully.'
@@ -131,7 +191,8 @@ export async function submitContactForm({ fullname, company, email, phone, addre
 }
 
 /**
- * Validates and submits a team member / maker application to Supabase.
+ * Validates and submits a team member / maker application to Supabase, then triggers
+ * an automated confirmation email.
  *
  * @param {Object} payload
  * @param {string} payload.fullname
@@ -171,10 +232,13 @@ export async function submitTeamApplication({ fullname, email, phone, role, cust
     };
   }
 
+  const submissionId = generateUuid();
+
   const { error } = await supabase
     .from('team_member_applications')
     .insert([
       {
+        id: submissionId,
         full_name: cleanName,
         email: cleanEmail,
         phone: cleanPhone,
@@ -191,6 +255,17 @@ export async function submitTeamApplication({ fullname, email, phone, role, cust
       error: error.message || 'Failed to submit application. Please try again.'
     };
   }
+
+  // Trigger automated confirmation email in the background
+  dispatchConfirmationEmail({
+    type: 'maker',
+    submissionId,
+    name: cleanName,
+    email: cleanEmail,
+    phone: cleanPhone,
+    role: cleanRole,
+    customRole: cleanCustomRole
+  });
 
   return {
     success: true,

@@ -13,7 +13,7 @@ export default function Header({ current = '' }) {
     <header className={`tn-bar ${open ? 'tn-open' : ''}`} data-tn>
       <div className="tn-in">
         <Link className="tn-logo" to="/" aria-label="THEUNOiA home">
-          <img src="/assets/logo.png" width="438" height="88" alt="THEUNOiA" />
+          <img src="/assets/logo.png" width="438" height="88" alt="THEUNOiA" decoding="async" />
         </Link>
         <button
           className="tn-burger"

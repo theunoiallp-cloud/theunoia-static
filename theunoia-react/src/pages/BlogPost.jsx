@@ -221,6 +221,10 @@ export default function BlogPost() {
                   src={article.author_avatar}
                   alt={article.author_name}
                   className="article-avatar"
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="article-avatar">
@@ -253,6 +257,8 @@ export default function BlogPost() {
             <img
               src={article.featured_image}
               alt={article.featured_image_alt || article.title}
+              fetchPriority="high"
+              decoding="async"
             />
             {article.featured_image_alt && (
               <figcaption>{article.featured_image_alt}</figcaption>
@@ -354,7 +360,7 @@ export default function BlogPost() {
                 <Link key={rel.id} to={`/blog/${rel.slug}`} className="blog-card">
                   <div className="blog-card-img-wrap">
                     {rel.featured_image ? (
-                      <img src={rel.featured_image} alt={rel.title} className="blog-card-img" loading="lazy" />
+                      <img src={rel.featured_image} alt={rel.title} className="blog-card-img" loading="lazy" decoding="async" />
                     ) : (
                       <div style={{ width: '100%', height: '100%', background: '#ECE5D6' }} />
                     )}

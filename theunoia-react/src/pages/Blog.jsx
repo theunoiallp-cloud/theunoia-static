@@ -196,7 +196,8 @@ export default function Blog() {
                   src={featuredArticle.featured_image}
                   alt={featuredArticle.featured_image_alt || featuredArticle.title}
                   className="blog-featured-img"
-                  loading="lazy"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               ) : (
                 <div
@@ -236,6 +237,7 @@ export default function Blog() {
                       alt={art.featured_image_alt || art.title}
                       className="blog-card-img"
                       loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div
