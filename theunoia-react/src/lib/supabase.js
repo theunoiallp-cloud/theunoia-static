@@ -16,11 +16,50 @@ export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseKey)
   : {
       from: () => ({
+        select: () => ({
+          eq: () => ({
+            or: () => ({
+              order: () => ({
+                range: async () => ({ data: [], count: 0, error: null }),
+                limit: async () => ({ data: [], count: 0, error: null })
+              }),
+              single: async () => ({ data: null, error: new Error('Unconfigured') })
+            }),
+            single: async () => ({ data: null, error: new Error('Unconfigured') })
+          }),
+          order: () => ({
+            range: async () => ({ data: [], count: 0, error: null })
+          }),
+          single: async () => ({ data: null, error: new Error('Unconfigured') })
+        }),
         insert: async () => ({
           data: null,
           error: new Error('Supabase credentials are not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.')
+        }),
+        update: () => ({
+          eq: () => ({
+            select: () => ({
+              single: async () => ({ data: null, error: new Error('Unconfigured') })
+            })
+          })
+        }),
+        delete: () => ({
+          eq: async () => ({ error: new Error('Unconfigured') })
         })
-      })
+      }),
+      auth: {
+        getUser: async () => ({ data: { user: null }, error: null }),
+        getSession: async () => ({ data: { session: null }, error: null }),
+        signInWithPassword: async () => ({ data: {}, error: new Error('Supabase not configured.') }),
+        signOut: async () => ({ error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
+      },
+      storage: {
+        from: () => ({
+          upload: async () => ({ data: null, error: new Error('Storage not configured') }),
+          getPublicUrl: () => ({ data: { publicUrl: '' } })
+        })
+      }
     };
 
 /**

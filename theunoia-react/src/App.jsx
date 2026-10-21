@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Story from './pages/Story.jsx';
@@ -6,15 +6,28 @@ import Team from './pages/Team.jsx';
 import Hivh from './pages/Hivh.jsx';
 import Hunhar from './pages/Hunhar.jsx';
 import Blog from './pages/Blog.jsx';
+import BlogPost from './pages/BlogPost.jsx';
 import Contact from './pages/Contact.jsx';
 import BecomeMaker from './pages/BecomeMaker.jsx';
+import Privacy from './pages/Privacy.jsx';
+import Terms from './pages/Terms.jsx';
+import Refund from './pages/Refund.jsx';
 import NotFound from './pages/NotFound.jsx';
+
+// Lazy load the editor so TipTap / editor packages never bloat the public website bundle
+const BlogEditor = lazy(() => import('./pages/BlogEditor.jsx'));
 
 /** Opens each page at the top (or at its #anchor). */
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    if (hash) { const el = document.getElementById(hash.slice(1)); if (el) { el.scrollIntoView(); return; } }
+    if (hash) {
+      const el = document.getElementById(hash.slice(1));
+      if (el) {
+        el.scrollIntoView();
+        return;
+      }
+    }
     window.scrollTo(0, 0);
   }, [pathname, hash]);
   return null;
@@ -48,8 +61,28 @@ export function AppRoutes() {
       <Route path="/hivh" element={<Hivh key="hivh" />} />
       <Route path="/hunhar" element={<Hunhar key="hunhar" />} />
       <Route path="/blog" element={<Blog key="blog" />} />
+      <Route path="/blog/:slug" element={<BlogPost key="blog-post" />} />
+      <Route
+        path="/blog/editor"
+        element={
+          <Suspense fallback={<div style={{ padding: '60px', textAlign: 'center', color: '#64748B' }}>Loading Editorial Studio...</div>}>
+            <BlogEditor />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/blog/editor/:id"
+        element={
+          <Suspense fallback={<div style={{ padding: '60px', textAlign: 'center', color: '#64748B' }}>Loading Editorial Studio...</div>}>
+            <BlogEditor />
+          </Suspense>
+        }
+      />
       <Route path="/contact" element={<Contact key="contact" />} />
       <Route path="/become-a-maker" element={<BecomeMaker key="become-a-maker" />} />
+      <Route path="/privacy" element={<Privacy key="privacy" />} />
+      <Route path="/terms" element={<Terms key="terms" />} />
+      <Route path="/refund" element={<Refund key="refund" />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

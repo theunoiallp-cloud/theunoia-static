@@ -262,7 +262,7 @@ function show(i,instant){
  const c=document.getElementById('bt-copy');
  const apply=()=>{const s=secs[i];
   c.className='copy '+(s.big?'big':'mid'+(s.top?' top':''));c.style.visibility=s.t?'':'hidden';
-  c.innerHTML=`<h1>${s.t}</h1><p>${s.p}</p>`;
+  c.innerHTML=`<h2>${s.t}</h2><p>${s.p}</p>`;
  };
  if(instant){apply();return;}
  c.classList.add('out');setTimeout(apply,420);

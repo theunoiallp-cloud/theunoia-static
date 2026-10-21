@@ -1,34 +1,30 @@
 User-agent: *
 Allow: /
+Disallow: /blog/editor
+Disallow: /blog/editor/
 
 User-agent: GPTBot
 Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
+Disallow: /blog/editor
 
 User-agent: ClaudeBot
 Allow: /
-
-User-agent: Claude-SearchBot
-Allow: /
-
-User-agent: Claude-User
-Allow: /
+Disallow: /blog/editor
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /blog/editor
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /blog/editor
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /blog/editor
 
 User-agent: CCBot
 Allow: /
+Disallow: /blog/editor
 
 Sitemap: https://www.theunoia.com/sitemap.xml

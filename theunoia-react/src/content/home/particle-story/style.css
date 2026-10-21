@@ -18,7 +18,7 @@
 #bt .tag::before{content:'';display:inline-block;width:4px;height:4px;background:var(--cream);margin-right:6px;vertical-align:1px}
 #bt .copy{position:fixed;z-index:10;left:50%;transform:translateX(-50%);text-align:center;transition:opacity .5s,transform .5s;width:min(92vw,760px);pointer-events:none}
 #bt .copy.out{opacity:0;transform:translate(-50%,12px)}
-#bt .copy h1{font-family:var(--serif);font-weight:400;color:#1d1e4a;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;font-weight:700;text-shadow:0 0 8px #f4efe2,0 0 22px #f4efe2}
+#bt .copy h1, #bt .copy h2{font-family:var(--serif);font-weight:400;color:#1d1e4a;text-transform:uppercase;letter-spacing:.04em;line-height:1.2;font-weight:700;text-shadow:0 0 8px #f4efe2,0 0 22px #f4efe2}
 #bt .copy p{font-size:13px;line-height:1.5;margin:14px auto 0;max-width:290px;font-weight:500;color:#1d1e4a;text-shadow:0 0 6px #f4efe2,0 0 16px #f4efe2}
 #bt .copy::before{content:'';position:absolute;inset:-50px -70px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,rgba(244,239,226,.9) 0%,rgba(244,239,226,.65) 45%,transparent 72%)}
 #bt .big p::before{display:none}
@@ -28,10 +28,10 @@
 #bt .copy .badge{width:22px;height:22px;border:1px solid var(--mint);color:var(--mint);border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-family:var(--mono);font-size:9px}
 #bt .btn{display:inline-block;margin-top:20px;padding:9px 18px;border:1px dashed #d4694a;border-radius:20px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream);background:rgba(166,245,207,.06)}
 #bt .big{top:30%;}
-#bt .big h1{font-size:clamp(38px,6.4vw,88px);word-spacing:.35em}
+#bt .big h1, #bt .big h2{font-size:clamp(38px,6.4vw,88px);word-spacing:.35em}
 #bt .big p{position:fixed;left:50%;bottom:13%;transform:translateX(-50%);width:290px}
 #bt .mid{bottom:15%}
-#bt .mid h1{font-size:clamp(24px,2.6vw,34px)}
+#bt .mid h1, #bt .mid h2{font-size:clamp(24px,2.6vw,34px)}
 #bt .mid.top{top:9%;bottom:auto}
 #bt .foot{bottom:calc(12vh + env(safe-area-inset-bottom,0px));left:4.5vw;right:4.5vw;display:flex;justify-content:space-between;font-family:var(--serif);font-size:14px;color:#1d1e4a;opacity:0;transition:.6s;text-transform:none;letter-spacing:0}
 #bt .foot.show{opacity:1}
