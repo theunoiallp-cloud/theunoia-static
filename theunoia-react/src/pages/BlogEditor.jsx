@@ -2,9 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import LinkExtension from '@tiptap/extension-link';
 import ImageExtension from '@tiptap/extension-image';
-import Underline from '@tiptap/extension-underline';
 import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import DOMPurify from 'dompurify';
 import {
@@ -29,6 +27,30 @@ const CATEGORIES = [
   'Design',
   'Client Stories',
   'Founder’s Notes'
+];
+
+/**
+ * Static TipTap extension suite.
+ * StarterKit v3.32 already provides bold, italic, strike, code, blockquote, bulletList,
+ * orderedList, heading, horizontalRule, link, and underline.
+ * Configuring them inside StarterKit avoids duplicate extension warnings.
+ */
+const EDITOR_EXTENSIONS = [
+  StarterKit.configure({
+    heading: { levels: [2, 3, 4] },
+    link: {
+      openOnClick: false,
+      HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' }
+    }
+  }),
+  ImageExtension.configure({
+    inline: true,
+    allowBase64: true
+  }),
+  Table.configure({ resizable: true }),
+  TableRow,
+  TableHeader,
+  TableCell
 ];
 
 export default function BlogEditor() {
@@ -81,32 +103,30 @@ export default function BlogEditor() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef(null);
 
-  // TipTap Editor
+  // Buffer for content pending editor initialization
+  const pendingContentRef = useRef(null);
+
+  // TipTap Editor with immediatelyRender: false for SSR / React 19 stability
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: { levels: [2, 3, 4] }
-      }),
-      Underline,
-      LinkExtension.configure({
-        openOnClick: false,
-        HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' }
-      }),
-      ImageExtension.configure({
-        inline: true,
-        allowBase64: true
-      }),
-      Table.configure({ resizable: true }),
-      TableRow,
-      TableHeader,
-      TableCell
-    ],
+    extensions: EDITOR_EXTENSIONS,
+    immediatelyRender: false,
     content: '',
     onUpdate: () => {
       setHasUnsavedChanges(true);
       setSaveStatus('Unsaved changes');
     }
   });
+
+  // Safe editor ready flag: checks both truthiness and destroyed status
+  const isEditorReady = Boolean(editor && !editor.isDestroyed);
+
+  // Flush pending content once the editor instance becomes ready
+  useEffect(() => {
+    if (isEditorReady && pendingContentRef.current !== null) {
+      editor.commands.setContent(pendingContentRef.current);
+      pendingContentRef.current = null;
+    }
+  }, [isEditorReady, editor]);
 
   // Check initial Auth
   useEffect(() => {
@@ -130,6 +150,35 @@ export default function BlogEditor() {
     }
   }, [user, offlineMode, loadSidebarArticles]);
 
+  const loadArticleIntoForm = useCallback((data) => {
+    setTitle(data.title || '');
+    setSlug(data.slug || '');
+    setExcerpt(data.excerpt || '');
+    setCategory(data.category || 'Insights');
+    setTags(data.tags || []);
+    setAuthorName(data.author_name || 'THEUNOiA Team');
+    setAuthorRole(data.author_role || 'Editorial');
+    setAuthorAvatar(data.author_avatar || '');
+    setFeaturedImage(data.featured_image || '');
+    setFeaturedImageAlt(data.featured_image_alt || '');
+    setSeoTitle(data.seo_title || '');
+    setSeoDescription(data.seo_description || '');
+    setStatus(data.status || 'draft');
+    setScheduledAt(data.scheduled_at ? data.scheduled_at.substring(0, 16) : '');
+    setPublishedAt(data.published_at || '');
+
+    const targetContent = data.content !== undefined ? data.content : '';
+    if (isEditorReady) {
+      editor.commands.setContent(targetContent);
+      pendingContentRef.current = null;
+    } else {
+      pendingContentRef.current = targetContent;
+    }
+
+    setHasUnsavedChanges(false);
+    setSaveStatus('Saved');
+  }, [isEditorReady, editor]);
+
   // Load Active Article Data
   useEffect(() => {
     if (!articleId) {
@@ -149,7 +198,14 @@ export default function BlogEditor() {
       setStatus('draft');
       setScheduledAt('');
       setPublishedAt('');
-      if (editor) editor.commands.setContent('');
+
+      if (isEditorReady) {
+        editor.commands.setContent('');
+        pendingContentRef.current = null;
+      } else {
+        pendingContentRef.current = '';
+      }
+
       setHasUnsavedChanges(false);
       setSaveStatus('New article draft');
       return;
@@ -173,32 +229,7 @@ export default function BlogEditor() {
       }
       loadArticleIntoForm(article);
     });
-  }, [articleId, editor]);
-
-  function loadArticleIntoForm(data) {
-    setTitle(data.title || '');
-    setSlug(data.slug || '');
-    setExcerpt(data.excerpt || '');
-    setCategory(data.category || 'Insights');
-    setTags(data.tags || []);
-    setAuthorName(data.author_name || 'THEUNOiA Team');
-    setAuthorRole(data.author_role || 'Editorial');
-    setAuthorAvatar(data.author_avatar || '');
-    setFeaturedImage(data.featured_image || '');
-    setFeaturedImageAlt(data.featured_image_alt || '');
-    setSeoTitle(data.seo_title || '');
-    setSeoDescription(data.seo_description || '');
-    setStatus(data.status || 'draft');
-    setScheduledAt(data.scheduled_at ? data.scheduled_at.substring(0, 16) : '');
-    setPublishedAt(data.published_at || '');
-
-    if (editor && data.content !== undefined) {
-      editor.commands.setContent(data.content || '');
-    }
-
-    setHasUnsavedChanges(false);
-    setSaveStatus('Saved');
-  }
+  }, [articleId, isEditorReady, editor, loadArticleIntoForm]);
 
   // Auto-generate slug from title if slug not manually customized
   const handleTitleChange = (val) => {
@@ -226,12 +257,13 @@ export default function BlogEditor() {
   useEffect(() => {
     const timer = setInterval(() => {
       if (hasUnsavedChanges && title) {
+        const currentContent = isEditorReady ? editor.getHTML() : (pendingContentRef.current || '');
         const payload = {
           id: articleId,
           title,
           slug,
           excerpt,
-          content: editor ? editor.getHTML() : '',
+          content: currentContent,
           category,
           tags,
           author_name: authorName,
@@ -251,7 +283,7 @@ export default function BlogEditor() {
       }
     }, 12000);
     return () => clearInterval(timer);
-  }, [hasUnsavedChanges, articleId, title, slug, excerpt, category, tags, authorName, authorRole, authorAvatar, featuredImage, featuredImageAlt, seoTitle, seoDescription, status, scheduledAt, editor]);
+  }, [hasUnsavedChanges, articleId, title, slug, excerpt, category, tags, authorName, authorRole, authorAvatar, featuredImage, featuredImageAlt, seoTitle, seoDescription, status, scheduledAt, isEditorReady, editor]);
 
   // Save Article Action
   const handleSave = async (overrideStatus = null) => {
@@ -259,7 +291,7 @@ export default function BlogEditor() {
     setSaving(true);
     setErrorMessage('');
 
-    const contentHtml = editor ? editor.getHTML() : '';
+    const contentHtml = isEditorReady ? editor.getHTML() : (pendingContentRef.current || '');
 
     const payload = {
       id: articleId,
@@ -370,14 +402,14 @@ export default function BlogEditor() {
   };
 
   // Word & Reading Time stats
-  const currentHtml = editor ? editor.getHTML() : '';
+  const currentHtml = isEditorReady ? editor.getHTML() : (pendingContentRef.current || '');
   const readingTime = calculateReadingTime(currentHtml);
   const wordCount = currentHtml ? currentHtml.replace(/<[^>]*>/g, ' ').trim().split(/\s+/).filter(Boolean).length : 0;
 
   // Insert Link Prompt
   const handleSetLink = () => {
-    if (!editor) return;
-    const previousUrl = editor.getAttributes('link').href;
+    if (!isEditorReady) return;
+    const previousUrl = editor.getAttributes('link')?.href;
     const url = window.prompt('Enter destination URL (https://...):', previousUrl || 'https://');
     if (url === null) return;
     if (url === '') {
@@ -389,7 +421,7 @@ export default function BlogEditor() {
 
   // Insert Image Prompt
   const handleInsertEditorImage = () => {
-    if (!editor) return;
+    if (!isEditorReady) return;
     const url = window.prompt('Enter image URL (https://...):');
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
@@ -434,75 +466,6 @@ export default function BlogEditor() {
     setHasUnsavedChanges(true);
   };
 
-  // Authentication Gate Overlay
-  if (authChecked && !user && !offlineMode) {
-    return (
-      <div className="editor-login-overlay">
-        <div className="editor-login-card">
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <img src="/assets/logo.png" width="220" alt="THEUNOiA" style={{ height: 'auto' }} />
-          </div>
-          <h2 className="editor-login-title">Editorial Studio Login</h2>
-          <p className="editor-login-desc">
-            Sign in with an authorized THEUNOiA editor account to manage articles, publish insights, and upload assets.
-          </p>
-
-          {loginError && (
-            <div style={{ background: '#FEE2E2', color: '#991B1B', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
-              {loginError}
-            </div>
-          )}
-
-          <form onSubmit={handleLogin}>
-            <div className="editor-field-group">
-              <label className="editor-label">Editor Email</label>
-              <input
-                type="email"
-                required
-                className="editor-input"
-                placeholder="editor@theunoia.com"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-              />
-            </div>
-            <div className="editor-field-group">
-              <label className="editor-label">Password</label>
-              <input
-                type="password"
-                required
-                className="editor-input"
-                placeholder="••••••••"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loginLoading}
-              className="blog-btn-primary"
-              style={{ width: '100%', justifyContent: 'center', marginTop: '12px' }}
-            >
-              {loginLoading ? 'Authenticating...' : 'Sign In to Studio'}
-            </button>
-          </form>
-
-          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(15, 27, 45, 0.1)', textAlign: 'center' }}>
-            <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '12px' }}>
-              First-time setup? You can provision an authorized user in your Supabase Auth dashboard or test the interface locally.
-            </p>
-            <button
-              type="button"
-              onClick={() => setOfflineMode(true)}
-              style={{ background: 'transparent', border: '1px dashed #C9A55C', color: '#C2653F', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
-            >
-              Enter Local Authoring / Preview Mode
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="editor-root">
       {/* Toast Notification */}
@@ -522,6 +485,73 @@ export default function BlogEditor() {
           fontWeight: 600
         }}>
           {successToast}
+        </div>
+      )}
+
+      {/* Authentication Gate Overlay: Rendered non-destructively on top */}
+      {authChecked && !user && !offlineMode && (
+        <div className="editor-login-overlay">
+          <div className="editor-login-card">
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <img src="/assets/logo.png" width="220" alt="THEUNOiA" style={{ height: 'auto' }} />
+            </div>
+            <h2 className="editor-login-title">Editorial Studio Login</h2>
+            <p className="editor-login-desc">
+              Sign in with an authorized THEUNOiA editor account to manage articles, publish insights, and upload assets.
+            </p>
+
+            {loginError && (
+              <div style={{ background: '#FEE2E2', color: '#991B1B', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
+                {loginError}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin}>
+              <div className="editor-field-group">
+                <label className="editor-label">Editor Email</label>
+                <input
+                  type="email"
+                  required
+                  className="editor-input"
+                  placeholder="editor@theunoia.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                />
+              </div>
+              <div className="editor-field-group">
+                <label className="editor-label">Password</label>
+                <input
+                  type="password"
+                  required
+                  className="editor-input"
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="blog-btn-primary"
+                style={{ width: '100%', justifyContent: 'center', marginTop: '12px' }}
+              >
+                {loginLoading ? 'Authenticating...' : 'Sign In to Studio'}
+              </button>
+            </form>
+
+            <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(15, 27, 45, 0.1)', textAlign: 'center' }}>
+              <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '12px' }}>
+                First-time setup? You can provision an authorized user in your Supabase Auth dashboard or test the interface locally.
+              </p>
+              <button
+                type="button"
+                onClick={() => setOfflineMode(true)}
+                style={{ background: 'transparent', border: '1px dashed #C9A55C', color: '#C2653F', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Enter Local Authoring / Preview Mode
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -759,8 +789,8 @@ export default function BlogEditor() {
                   />
                 </div>
 
-                {/* TipTap Rich Text Toolbar */}
-                {editor && (
+                {/* TipTap Rich Text Toolbar: guarded by isEditorReady */}
+                {isEditorReady && (
                   <div className="tiptap-toolbar" role="toolbar" aria-label="Formatting options">
                     <button
                       type="button"
@@ -915,8 +945,14 @@ export default function BlogEditor() {
                   </div>
                 )}
 
-                {/* Editor Content Canvas */}
-                <EditorContent editor={editor} />
+                {/* Editor Content Canvas: Guarded against premature rendering */}
+                {isEditorReady ? (
+                  <EditorContent editor={editor} />
+                ) : (
+                  <div style={{ padding: '60px 0', textAlign: 'center', color: '#94A3B8', fontSize: '14px' }}>
+                    Loading editorial canvas...
+                  </div>
+                )}
 
                 {/* Footer Stats Bar */}
                 <div style={{ marginTop: '36px', paddingTop: '16px', borderTop: '1px solid rgba(15, 27, 45, 0.08)', display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#64748B' }}>
