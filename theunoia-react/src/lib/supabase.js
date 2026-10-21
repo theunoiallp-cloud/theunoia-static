@@ -86,7 +86,11 @@ function generateUuid() {
  */
 async function dispatchConfirmationEmail(payload) {
   try {
-    const response = await fetch('/api/send-confirmation', {
+    const endpoint = typeof window !== 'undefined' && window.location?.origin
+      ? `${window.location.origin}/api/send-confirmation`
+      : '/api/send-confirmation';
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

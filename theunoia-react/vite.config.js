@@ -20,7 +20,7 @@ function localApiPlugin() {
                 req.body = {};
               }
               try {
-                const { default: handler } = await import('../../api/send-confirmation.js');
+                const { default: handler } = await import('./api/send-confirmation.js');
                 await handler(req, res);
               } catch (err) {
                 console.error('[Local API Error]', err);
