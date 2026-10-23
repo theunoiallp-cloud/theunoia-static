@@ -27,7 +27,7 @@ html{scroll-behavior:smooth}
 .detail .btn.solid{background:var(--ivory);color:var(--navy)}
 .detail .btn.ghost{border:1.5px solid rgba(247,242,232,.7);color:var(--ivory)}
 .detail .logo-panel{border-radius:16px;aspect-ratio:5/4;max-width:100%;display:grid;place-items:center;padding:12%}
-.detail .logo-panel img{max-width:100%;max-height:100%;display:block}
+.detail .logo-panel img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;image-rendering:-webkit-optimize-contrast}
 .detail .panel{background:var(--ivory);border-radius:20px;padding:clamp(24px,4vw,52px)}
 .detail .panel h2{font-family:var(--poster);font-weight:400;font-size:clamp(32px,4vw,48px);line-height:1;margin:0 0 8px}
 .detail .panel .sub{margin:0 0 clamp(20px,3vw,36px);color:var(--ink);max-width:60ch}

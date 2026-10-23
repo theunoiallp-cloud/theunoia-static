@@ -87,4 +87,4 @@ dd{margin:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-.tile.face,.photo{position:relative;overflow:hidden}.tile.face .pic,.photo .pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;z-index:1}.photo .badge{z-index:2}
+.tile.face,.photo{position:relative;overflow:hidden}.tile.face .pic,.photo .pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;z-index:1;image-rendering:-webkit-optimize-contrast}.photo .badge{z-index:2}

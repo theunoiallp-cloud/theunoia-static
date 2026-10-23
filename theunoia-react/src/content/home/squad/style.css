@@ -61,7 +61,7 @@
 #sq .replay{position:absolute;right:1.6cqw;bottom:1.6cqw;z-index:300;border:0;background:var(--pill);border-radius:.6cqw;padding:.8cqw 1.2cqw;font:600 1.05cqw "Plus Jakarta Sans",sans-serif;color:var(--ink);cursor:pointer;transition:background .2s,color .2s,opacity .4s;opacity:0;pointer-events:none}
 #sq .replay.on{opacity:1;pointer-events:auto}
 #sq .replay:hover{background:var(--ink);color:#fff}
-#sq .card{position:absolute;left:0;top:0;width:180px;height:244px;transform-style:preserve-3d;will-change:transform}
+#sq .card{position:absolute;left:0;top:0;width:180px;height:244px;transform-style:preserve-3d;will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 #sq .bob{width:100%;height:100%;transform-style:preserve-3d}
 #sq .bob.float{animation:sq-cardfloat var(--fd,5s) ease-in-out var(--fdel,0s) infinite}
 @keyframes sq-cardfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
@@ -99,4 +99,4 @@
 }
 
 
-#sq .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none}
+#sq .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;user-select:none;border-radius:8px;image-rendering:-webkit-optimize-contrast;transform:translateZ(0)}

@@ -116,6 +116,11 @@ export default function BlogPost() {
     if (ogImg && article.featured_image) {
       ogImg.setAttribute('content', article.featured_image);
     }
+
+    const twImg = document.querySelector('meta[name="twitter:image"]');
+    if (twImg && article.featured_image) {
+      twImg.setAttribute('content', article.featured_image);
+    }
   }, [article]);
 
   const { processedHtml, toc } = useMemo(() => {
