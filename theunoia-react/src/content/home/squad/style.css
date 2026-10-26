@@ -26,8 +26,8 @@
 #sq .frame.outro .big.l1{transform:translateY(8cqw);opacity:0}
 #sq .face{position:absolute;left:41.5cqw;top:20.5cqw;width:17cqw;z-index:100;transition:transform .4s cubic-bezier(.2,.8,.2,1);pointer-events:none}
 #sq .face .luna{position:relative;filter:drop-shadow(0 1.2cqw 1.4cqw rgba(0,0,0,.1));opacity:0;transform:scale(.3)}
-#sq .face .luna img{width:100%;display:block}
-#sq .face .luna .closed{position:absolute;inset:0;opacity:0}
+#sq .face .luna img{width:100%;height:auto;display:block}
+#sq .face .luna .closed{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0}
 #sq .face .luna.blink .closed{opacity:1}
 #sq .frame.outro .face .luna{animation:sq-pop .9s cubic-bezier(.34,1.56,.64,1) .35s forwards, sq-bob 5s ease-in-out 1.3s infinite}
 #sq .say{position:absolute;left:58.5cqw;top:6.5cqw;width:23cqw;aspect-ratio:320/200;z-index:270;pointer-events:none;
@@ -100,3 +100,12 @@
 
 
 #sq .portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;user-select:none;border-radius:8px;image-rendering:-webkit-optimize-contrast;transform:translateZ(0)}
+
+@media (prefers-reduced-motion: reduce){
+  #sq .bob.float,
+  #sq .heart,
+  #sq .sprout,
+  #sq .say .float,
+  #sq .frame.outro .face .luna{animation:none!important}
+  #sq .face .luna{opacity:1!important;transform:none!important}
+}

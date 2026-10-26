@@ -221,7 +221,7 @@ function init(){
    uHp:{value:new THREE.Vector2(0,3.7)},uLs:{value:LS},uLo:{value:new THREE.Vector2(0,LO_Y)},uM:{value:new THREE.Vector3()}}}));
  pts.frustumCulled=false; // positions are made in the shader, so the box three.js measures is not the real one
  scene.add(pts);
- document.querySelectorAll('[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();go(+a.dataset.go)});
+ document.querySelectorAll('[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();const idx=+a.dataset.go;window.scrollTo({top:chY(idx),behavior:'smooth'});});
  const pl=document.createElement('div');pl.id='bt-pins';STAGE.appendChild(pl);
  logo.cities.forEach(c=>{const d=document.createElement('div');d.className='cpin'+(c.hub?' hub':'');d.innerHTML='<i></i><b>'+c.name+'</b>';pl.appendChild(d);c.el=d;c.lb=d.querySelector('b');});
  show(0,true);
@@ -269,54 +269,23 @@ function show(i,instant){
 }
 const eas=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 function setSec(i){if(i===sec)return;if(i===CITY_SEC)traceStart=performance.now()+400;sec=i;show(i);}
-/* Slide 2 is pinned: one scroll gesture = one chapter. While a design is still forming the page does not move;
-   when it has finished, the next scroll glides on to the next chapter. After the last chapter the page scrolls on normally. */
+/* Slide 2: continuous uninterrupted natural scrolling.
+   Chapters advance smoothly driven by scroll position without blocking or trapping. */
 const DUR=1500, NCH=secs.length;
-let ch=0,from=0,to=0,busy=false,ct0=0,doneAt=0,lastWheel=0,glide=null,wasPinned=false;
+let ch=0,from=0,to=0,busy=false,ct0=0,doneAt=0;
 const chY=i=>SEC.getBoundingClientRect().top+scrollY+i*STEP/100*innerHeight;
-function pinned(){const r=SEC.getBoundingClientRect();return r.top<=2&&r.bottom>=innerHeight-2;}
-function finished(){return !busy&&!glide&&!(sec===CITY_SEC&&trG<G_END);}   // the city logo must be fully drawn too
-function stepTo(d){const nx=ch+d;if(nx<0||nx>NCH-1)return false;from=ch;to=nx;ch=nx;busy=true;ct0=performance.now();
-  const y0=scrollY,y1=chY(nx);glide={y0,y1,t:ct0};return true;}
-function atEnd(d){if(scrollY>chY(NCH-1)+2)return true;   // past the last chapter: normal scrolling
- return (d>0&&ch===NCH-1&&finished())||(d<0&&ch===0&&finished());}
-addEventListener('wheel',e=>{
-  if(!pinned())return;
-  const d=Math.sign(e.deltaY);if(!d)return;
-  const now=performance.now(),fresh=now-lastWheel>220||now-doneAt>800;lastWheel=now;
-  if(atEnd(d))return;                                   // let the page carry on past the slide
-  e.preventDefault();
-  if(!finished()||!fresh)return;                        // design still running, or the same flick still coasting
-  stepTo(d);
-},{passive:false});
-addEventListener('keydown',e=>{
-  if(!pinned())return;const k=e.key;
-  const d=['ArrowDown','PageDown',' '].includes(k)?1:['ArrowUp','PageUp'].includes(k)?-1:0;if(!d)return;
-  if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
-  if(atEnd(d))return;e.preventDefault();if(finished())stepTo(d);
-});
-let ty0=null,tBlock=false;
-addEventListener('touchstart',e=>{ty0=e.touches[0].clientY;tBlock=false;},{passive:true});
-addEventListener('touchmove',e=>{
-  if(ty0==null||!pinned())return;const dy=ty0-e.touches[0].clientY;if(Math.abs(dy)<4)return;
-  const d=Math.sign(dy);if(atEnd(d))return;tBlock=true;e.preventDefault();
-},{passive:false});
-addEventListener('touchend',e=>{
-  if(ty0==null)return;const dy=ty0-e.changedTouches[0].clientY;ty0=null;
-  if(tBlock&&Math.abs(dy)>30&&finished())stepTo(Math.sign(dy));
-},{passive:true});
+function stepTo(d){const nx=Math.max(0,Math.min(NCH-1,ch+d));if(nx===ch)return false;from=ch;to=nx;ch=nx;busy=true;ct0=performance.now();return true;}
 function animate(time){
  requestAnimationFrame(animate);
  const s=time*.001,dt=Math.max(0,Math.min(s-last,.05));last=s;
  const now=performance.now();
- if(glide){const k=Math.min(1,(now-glide.t)/DUR);scrollTo(0,glide.y0+(glide.y1-glide.y0)*eas(k));if(k>=1)glide=null;}
- const p=pinned();
- if(p&&!wasPinned&&!glide){            // arriving: start on the nearest end chapter
-  const rel=(scrollY-chY(0))/(STEP/100*innerHeight);ch=Math.max(0,Math.min(NCH-1,Math.round(rel)));from=to=ch;busy=false;}
- wasPinned=p;
- if(p&&!glide){const y=chY(ch);if(scrollY<chY(NCH-1)-1&&Math.abs(scrollY-y)>1)scrollTo(0,y);}   // stay on the chapter while pinned
  const br=SEC.getBoundingClientRect();
  if(br.bottom<=0||br.top>=innerHeight)return; // off screen: don't draw
+ const rel=(scrollY-chY(0))/(STEP/100*innerHeight);
+ const targetCh=Math.max(0,Math.min(NCH-1,Math.round(rel)));
+ if(targetCh!==to){
+   from=to;to=targetCh;ch=targetCh;busy=true;ct0=now;
+ }
  const u=pts.material.uniforms;
  let k=1;
  if(busy){k=Math.min(1,(now-ct0)/DUR);if(k>=1){busy=false;from=to;doneAt=now;}}

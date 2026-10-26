@@ -531,6 +531,7 @@ function readScroll(){
   const t=Math.max(0,-r.top)/vh*100;
   if(isFinite(t))target=t;
   if(!intro&&r.top<innerHeight*.6&&r.bottom>0)startIntro();
+  if(target>2&&intro<2)finishIntro();
 }
 function loop(now){
   // the host may give the page a 0×0 size at first, or resize it later: re-measure whenever that changes
@@ -557,17 +558,10 @@ layout();readScroll();cur=target;
 document.fonts&&document.fonts.ready.then(layout);
 requestAnimationFrame(loop);
 window.__tu={state:()=>({cur,target,intro,B,stage})};
-/* Meet THEUNOiA: only the opening ("Meet THEUNOiA!" + stickers + the bird landing) holds the page.
-   After it has played, the note and the drawers scroll freely, following the visitor's scroll. */
+/* Meet THEUNOiA: natural scrolling is uninterrupted. The dots allow jumping to stops. */
 (function(){
  const top0=()=>root.getBoundingClientRect().top+scrollY;
- const holding=()=>{const r=root.getBoundingClientRect();return intro<2&&r.top<=2&&r.top>-innerHeight*.25&&r.bottom>=innerHeight-2;};
  window.__tuStop=i=>{if(intro<2)finishIntro();const s=[0,TL.write[1]+5,TL.dr[0]+4][i]||0;scrollTo({top:top0()+s*innerHeight/100,behavior:'smooth'});};
- const block=e=>{if(holding()){e.preventDefault();if(Math.abs(scrollY-top0())>1)scrollTo(0,top0());}};
- addEventListener('wheel',e=>{if(e.deltaY>0)block(e);},{passive:false});
- addEventListener('touchmove',block,{passive:false});
- addEventListener('keydown',e=>{if(['ArrowDown','PageDown',' '].includes(e.key)&&!(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName)))block(e);});
- (function hold(){requestAnimationFrame(hold);if(holding()&&scrollY>top0()+1)scrollTo(0,top0());})();
 })();
 
 })();
