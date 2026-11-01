@@ -53,6 +53,7 @@ h2{margin:0;font-size:38px;line-height:1.12;font-weight:800;letter-spacing:-.02e
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .card h3{margin:0;font-size:15px;font-weight:800;line-height:1.3}
 .card .role{margin:3px 0 0;font-size:12.5px;line-height:1.4;color:var(--grey)}
+.card .inst{margin:4px 0 0;font-size:12px;line-height:1.35;color:var(--gold-ink);font-weight:600;word-break:break-word}
 .toggle{flex:0 0 44px;width:44px;height:44px;margin:-10px -10px 0 0;border:0;background:transparent;color:var(--terra);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:12px}
 .toggle svg{transition:transform .25s}
 .card.open .toggle svg{transform:rotate(45deg)}
@@ -60,14 +61,11 @@ h2{margin:0;font-size:38px;line-height:1.12;font-weight:800;letter-spacing:-.02e
 .photo .head{position:absolute;top:34px;left:50%;transform:translateX(-50%);width:64px;height:64px;border-radius:50%;background:var(--stone-2)}
 .photo .body{width:128px;height:74px;border-radius:999px 999px 0 0;background:var(--stone-2)}
 .photo .ini{position:absolute;top:55px;left:0;right:0;text-align:center;font-weight:800;font-size:17px;letter-spacing:.06em}
-.badge{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--navy);color:var(--gold);padding:4px 8px;border-radius:999px}
 dl{margin:0;display:none;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px;font-size:13px;line-height:1.45}
 .card.open dl{display:flex}
 dl div{display:flex;flex-direction:column;gap:2px}
 dt{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink)}
 dd{margin:0}
-.links{flex-direction:row!important;gap:14px!important}
-.links a{font-size:13px;font-weight:700}
 
 /* Join */
 .join{padding-bottom:104px}
@@ -87,4 +85,4 @@ dd{margin:0}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-.tile.face,.photo{position:relative;overflow:hidden}.tile.face .pic,.photo .pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;z-index:1;image-rendering:-webkit-optimize-contrast}.photo .badge{z-index:2}
+.tile.face,.photo{position:relative;overflow:hidden}.tile.face .pic,.photo .pic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;z-index:1;image-rendering:-webkit-optimize-contrast}

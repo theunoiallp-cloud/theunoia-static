@@ -1,27 +1,47 @@
 (function () {
   var people = [
-    { id: 'sai', since: 'Oct 2025', name: 'Sai Krishnan', role: 'Managing Director & Founder', dept: 'Compass', bio: 'Founded THEUNOiA and holds final decision authority across every department.' },
-    { id: 'adil', since: 'Oct 2025', name: 'Adil Hassani', role: 'Capital Operations Architect', dept: 'The Vault', bio: 'Runs finance — capital, accounts and the money side of every move.' },
-    { id: 'narayani', since: 'Oct 2025', name: 'Narayani Dey', role: 'Legal Custodian · Head of Studio', dept: 'Chambers + Studio', bio: 'Leads legal at Chambers and heads the creative department, Studio.' },
-    { id: 'snehith', since: 'Aug 2026', name: 'Snehith Krishna', role: 'Accountability Anchor', dept: 'Compass', bio: 'Keeps the squad accountable — deadlines, check-ins and follow-through.' },
-    { id: 'kanchan', since: 'Dec 2025', name: 'Kanchan Barapatre', role: 'Head of Guild', dept: 'Guild', bio: 'Builds Guild — a strong base of hustlers across every field.' },
-    { id: 'yash', since: 'Jul 2026', name: 'Yashowardhan Joshi', role: 'Strategic Scout', dept: 'Compass', bio: 'Scouts new opportunities, partners and directions for THEUNOiA to grow into.' },
-    { id: 'madhiya', since: 'Aug 2026', name: 'Madiha Bhesaniya', role: 'Strategic Intelligence Lead', dept: 'Compass', bio: 'Gathers research and market insight so every big decision is backed by facts.' },
-    { id: 'parinika', since: 'Dec 2026', name: 'Guntamukkala Parinika', role: 'Mentor Advisor', dept: 'Mentoria', bio: 'Guides students and connects them with mentors who help them grow.' },
-    { id: 'anushree', since: 'Jan 2026', name: 'Anushree Banthia', role: 'Venture Ideation Captain', dept: 'Studio', bio: 'Shapes raw ideas into ventures and products worth building.' },
-    { id: 'yachika', since: 'Jan 2026', name: 'Yachika Nimje', role: 'Visual Designer', dept: 'Studio', bio: 'Designs the visuals that bring THEUNOiA\'s ideas to life.' },
-    { id: 'tanvi', since: 'Jul 2026', name: 'Tanvi Ambare', role: 'Brand Identity Lead', dept: 'Hype House', bio: 'Keeps THEUNOiA\'s look, voice and identity consistent everywhere.' },
-    { id: 'harish', since: 'Sep 2026', name: 'Harish Prabhu', role: 'Brand Architect', dept: 'Hype House', bio: 'Builds the brand story and how the world sees THEUNOiA.' },
-    { id: 'aarav', since: 'Aug 2026', name: 'Aarav Patro', role: 'Tech Forge Lead', dept: 'Build Division', bio: 'Leads the tech team that builds THEUNOiA\'s software and platforms.' },
-    { id: 'gokul', since: 'Oct 2025', name: 'Gokul Krishnan', role: 'Organic Growth Lead', dept: 'Algorithm Desk', bio: 'Grows THEUNOiA\'s audience through content, search and community.' },
-    { id: 'tamil', since: 'Oct 2025', name: 'Tamil Selvan', role: 'Digital Acquisition Lead', dept: 'Algorithm Desk', bio: 'Runs digital campaigns that bring new users and clients to THEUNOiA.' }
+    { id: 'sai', since: 'Oct 2025', name: 'Sai Krishnan', role: 'Managing Director & Founder', dept: 'Compass', institution: 'PSG IAS', bio: 'Founded THEUNOiA and holds final decision authority across every department.' },
+    { id: 'snehith', since: 'Aug 2026', name: 'Snehith Krishna', role: 'Operations & Management Lead', dept: 'Compass', institution: 'GMR Institution', bio: 'Keeps the squad accountable — deadlines, check-ins and follow-through.' },
+    { id: 'adil', since: 'Oct 2025', name: 'Adil Hassani', role: 'Finance Lead', dept: 'The Vault', institution: 'R.A. Podar College of Commerce and Economics', bio: 'Runs finance — capital, accounts and the money side of every move.' },
+    { id: 'kanchan', since: 'Dec 2025', name: 'Kanchan Barapatre', role: 'Guild Coordinator', dept: 'Guild', institution: 'Cummins College of Engineering for Women, Nagpur', bio: 'Builds Guild — a strong base of hustlers across every field.' },
+    { id: 'madhiya', since: 'Aug 2026', name: 'Madiha Bhesaniya', role: 'Research Analyst', dept: 'Compass', institution: 'Cummins College of Engineering for Women, Nagpur', bio: 'Gathers research and market insight so every big decision is backed by facts.' },
+    { id: 'yash', since: 'Jul 2026', name: 'Yashowardhan Joshi', role: 'Strategy Analyst', dept: 'Compass', institution: 'Institute of Hotel Management, Aurangabad', bio: 'Scouts new opportunities, partners and directions for THEUNOiA to grow into.' },
+    { id: 'parinika', since: 'Dec 2026', name: 'Guntamukkala Parinika', role: 'Mentor Advisor', dept: 'Mentoria', institution: 'AIIMS Raipur', bio: 'Guides students and connects them with mentors who help them grow.' },
+    { id: 'anushree', since: 'Jan 2026', name: 'Anushree Banthia', role: 'Creative Lead', dept: 'Studio', institution: 'CEPT University', bio: 'Shapes raw ideas into ventures and products worth building.' },
+    { id: 'narayani', since: 'Oct 2025', name: 'Narayani Dey', role: 'Legal Lead', dept: 'Chambers + Studio', institution: 'RTMNU Babasaheb Ambedkar School of Law, Nagpur', bio: 'Leads legal at Chambers and heads the creative department, Studio.' },
+    { id: 'tanvi', since: 'Jul 2026', name: 'Tanvi Ambare', role: 'Brand Designer', dept: 'Hype House', institution: 'IDEAS, Nagpur', bio: 'Keeps THEUNOiA\'s look, voice and identity consistent everywhere.' },
+    { id: 'harish', since: 'Sep 2026', name: 'Harish Prabhu', role: 'Brand & Marketing Lead', dept: 'Hype House', institution: 'PSG IAS', bio: 'Builds the brand story and how the world sees THEUNOiA.' },
+    { id: 'aarav', since: 'Aug 2026', name: 'Aarav Patro', role: 'Technology Head', dept: 'Build Division', institution: 'KIIT University', bio: 'Leads the tech team that builds THEUNOiA\'s software and platforms.' },
+    { id: 'gokul', since: 'Oct 2025', name: 'Gokul Krishnan', role: 'Organic Growth Lead', dept: 'Algorithm Desk', institution: 'Christ University', bio: 'Grows THEUNOiA\'s audience through content, search and community.' },
+    { id: 'tamil', since: 'Oct 2025', name: 'Tamil Selvan', role: 'Digital Acquisition Specialist', dept: 'Algorithm Desk', institution: 'VIT Vellore', bio: 'Runs digital campaigns that bring new users and clients to THEUNOiA.' },
+    { id: 'yachika', since: 'Jan 2026', name: 'Yachika Nimje', role: 'Visual Designer', dept: 'Studio', institution: 'Shri Shivaji Education Society Science College', bio: 'Designs the visuals that bring THEUNOiA\'s ideas to life.' },
+    { id: 'vijay', since: 'Oct 2025', name: 'Vijay', role: 'Software Development Lead', dept: 'Build Division', institution: 'Amity University, Noida', bio: 'Architects and scales high-performance web applications and software systems.' },
+    { id: 'thoufiq', since: 'Oct 2025', name: 'Thoufiq', role: 'Community Operations Anchor', dept: 'Compass', institution: 'PSG CAS', bio: 'Coordinates team operations, community initiatives, and cross-functional momentum.' }
   ];
   function initials(n) {
     var p = n.split(' ');
     return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : (p[0][1] || ''))).toUpperCase();
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  var IMG = {sai:'/assets/img/b74da8f671fb.webp',adil:'/assets/img/dedefac4a87b.webp',narayani:'/assets/img/aba39a9187db.webp',snehith:'/assets/img/050c403726ac.webp',kanchan:'/assets/img/43c611e2d356.webp',yash:'/assets/img/2c26f57c1b9d.webp',anushree:'/assets/img/b26ee044ae53.webp',tanvi:'/assets/img/9d0c7f91ba51.webp',harish:'/assets/img/249fc39cf01e.webp',gokul:'/assets/img/fec4b2619172.webp',aarav:'/assets/img/aa940f2d8557.webp',tamil:'/assets/img/235d6213239b.webp',yachika:'/assets/img/95163421955d.webp',parinika:'/assets/img/5a76bd6b847f.webp',madhiya:'/assets/img/86dafa9e6ba6.webp'};
+  var IMG = {
+    sai: '/assets/img/b74da8f671fb.webp',
+    adil: '/assets/img/dedefac4a87b.webp',
+    narayani: '/assets/img/aba39a9187db.webp',
+    snehith: '/assets/img/050c403726ac.webp',
+    kanchan: '/assets/img/43c611e2d356.webp',
+    yash: '/assets/img/2c26f57c1b9d.webp',
+    anushree: '/assets/img/b26ee044ae53.webp',
+    tanvi: '/assets/img/9d0c7f91ba51.webp',
+    harish: '/assets/img/249fc39cf01e.webp',
+    gokul: '/assets/img/fec4b2619172.webp',
+    aarav: '/assets/img/aa940f2d8557.webp',
+    tamil: '/assets/img/235d6213239b.webp',
+    yachika: '/assets/img/95163421955d.webp',
+    parinika: '/assets/img/5a76bd6b847f.webp',
+    madhiya: '/assets/img/86dafa9e6ba6.webp',
+    vijay: '/assets/img/fd344294d0f4.webp',
+    thoufiq: '/assets/img/b3e3060fb2e1.webp'
+  };
   function pic(p) { return IMG[p.id] ? '<img class="pic" src="' + IMG[p.id] + '" alt="' + esc(p.name) + '" decoding="async">' : ''; }
   var byId = {}; people.forEach(function (p) { p.ini = initials(p.name); byId[p.id] = p; });
 
@@ -70,15 +90,14 @@
   function renderGrid() {
     gridEl.innerHTML = people.filter(function (p) { return inDept(p, state.dept); }).map(function (p) {
       return '<article class="card" data-id="' + p.id + '">' +
-        '<div class="card-top"><div><h3>' + esc(p.name) + '</h3><p class="role">' + esc(p.role) + '</p></div>' +
+        '<div class="card-top"><div><h3>' + esc(p.name) + '</h3><p class="role">' + esc(p.role) + '</p>' + (p.institution ? '<p class="inst">' + esc(p.institution) + '</p>' : '') + '</div>' +
         '<button type="button" class="toggle" aria-expanded="false" aria-controls="d-' + p.id + '" aria-label="Show details for ' + esc(p.name) + '">' + plus + '</button></div>' +
-        '<div class="photo"><div class="head"></div><div class="body"></div><span class="ini">' + p.ini + '</span>' + pic(p) + (p.core ? '<span class="badge">Core</span>' : '') + '</div>' +
+        '<div class="photo"><div class="head"></div><div class="body"></div><span class="ini">' + p.ini + '</span>' + pic(p) + '</div>' +
         '<dl id="d-' + p.id + '">' +
           '<div><dt>Department</dt><dd style="font-weight:600">' + esc(p.dept) + '</dd></div>' +
-          '<div><dt>Status</dt><dd>' + 'Maker' + '</dd></div>' +
+          '<div><dt>Institution</dt><dd style="font-weight:600;color:#14213D">' + esc(p.institution || '—') + '</dd></div>' +
           '<div><dt>Making since</dt><dd>' + esc(p.since || '') + '</dd></div>' +
           '<div><dt>What they do</dt><dd style="color:#3A3F4C">' + esc(p.bio) + '</dd></div>' +
-          '<div class="links"><a href="#">LinkedIn ↗</a><a href="#">Portfolio ↗</a></div>' +
         '</dl></article>';
     }).join('');
   }

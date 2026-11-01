@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import Home from './pages/Home.jsx';
 
 // Route-level code splitting: secondary pages load on demand
@@ -96,6 +97,7 @@ export default function App() {
       <ScrollManager />
       <LinkCatcher />
       <AppRoutes />
+      <Analytics />
     </BrowserRouter>
   );
 }

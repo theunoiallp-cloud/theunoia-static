@@ -9,7 +9,6 @@
 CREATE TABLE IF NOT EXISTS public.contact_submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name TEXT NOT NULL,
-  company TEXT,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   address TEXT,

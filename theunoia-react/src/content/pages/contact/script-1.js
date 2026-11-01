@@ -41,7 +41,6 @@ if (form && status) {
 
     const payload = {
       fullname: fd.get('fullname'),
-      company: fd.get('company'),
       email: fd.get('email'),
       phone: combinedPhone,
       address: fd.get('address'),

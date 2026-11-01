@@ -117,19 +117,17 @@ async function dispatchConfirmationEmail(payload) {
  *
  * @param {Object} payload
  * @param {string} payload.fullname
- * @param {string} [payload.company]
  * @param {string} payload.email
  * @param {string} payload.phone
  * @param {string} [payload.address]
  * @param {string} payload.message
  * @returns {Promise<{ success: boolean, message?: string, error?: string }>}
  */
-export async function submitContactForm({ fullname, company, email, phone, address, message }) {
+export async function submitContactForm({ fullname, email, phone, address, message }) {
   const cleanName = (fullname || '').trim();
   const cleanEmail = (email || '').trim();
   const cleanPhone = (phone || '').trim();
   const cleanMessage = (message || '').trim();
-  const cleanCompany = (company || '').trim() || null;
   const cleanAddress = (address || '').trim() || null;
 
   if (!cleanName) {
@@ -160,7 +158,6 @@ export async function submitContactForm({ fullname, company, email, phone, addre
       {
         id: submissionId,
         full_name: cleanName,
-        company: cleanCompany,
         email: cleanEmail,
         phone: cleanPhone,
         address: cleanAddress,
@@ -183,7 +180,6 @@ export async function submitContactForm({ fullname, company, email, phone, addre
     submissionId,
     name: cleanName,
     email: cleanEmail,
-    company: cleanCompany,
     phone: cleanPhone,
     message: cleanMessage
   });
